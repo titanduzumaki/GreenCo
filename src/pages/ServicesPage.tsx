@@ -1,0 +1,127 @@
+import { CheckCircle, Zap, Building, Leaf, Wrench, Globe, Battery } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+
+export function ServicesPage() {
+  const services = [
+    {
+      icon: <Zap className="w-12 h-12 text-green-400" />,
+      title: "Power Grid Infrastructure",
+      description: "Design and implementation of modern electrical grid systems for efficient energy distribution across urban and rural areas.",
+      features: ["Smart Grid Technology", "Load Balancing", "Grid Modernization", "Fault Detection Systems"],
+      category: "Infrastructure"
+    },
+    {
+      icon: <Building className="w-12 h-12 text-blue-400" />,
+      title: "Smart City Solutions",
+      description: "Comprehensive smart city infrastructure including intelligent lighting, traffic management, and IoT integration.",
+      features: ["Smart Lighting", "Traffic Control", "IoT Integration", "Energy Management"],
+      category: "Smart Technology"
+    },
+    {
+      icon: <Leaf className="w-12 h-12 text-green-500" />,
+      title: "Renewable Integration",
+      description: "Seamless integration of solar, wind, and other renewable energy sources into existing power infrastructure.",
+      features: ["Solar Integration", "Wind Power", "Energy Storage", "Grid Compatibility"],
+      category: "Renewable Energy"
+    },
+    {
+      icon: <Wrench className="w-12 h-12 text-orange-400" />,
+      title: "Maintenance & Support",
+      description: "24/7 maintenance services ensuring optimal performance and longevity of electrical infrastructure systems.",
+      features: ["Preventive Maintenance", "Emergency Repairs", "System Monitoring", "Performance Optimization"],
+      category: "Support"
+    },
+    {
+      icon: <Globe className="w-12 h-12 text-purple-400" />,
+      title: "Network Management",
+      description: "Advanced network management solutions for monitoring and controlling distributed electrical systems.",
+      features: ["Real-time Monitoring", "Remote Control", "Data Analytics", "Predictive Maintenance"],
+      category: "Management"
+    },
+    {
+      icon: <Battery className="w-12 h-12 text-yellow-400" />,
+      title: "Energy Storage",
+      description: "Battery storage solutions and energy management systems for enhanced grid stability and efficiency.",
+      features: ["Battery Systems", "Energy Management", "Grid Stability", "Peak Shaving"],
+      category: "Storage"
+    }
+  ];
+
+  return (
+    <div className="min-h-screen py-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+            Our <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">Services</span>
+          </h1>
+          <p className="text-xl text-white/70 max-w-3xl mx-auto">
+            Comprehensive electrical infrastructure solutions designed to meet the evolving needs 
+            of modern cities and communities. From smart grids to renewable integration, 
+            we deliver cutting-edge technology with proven reliability.
+          </p>
+        </div>
+
+        {/* Services Grid */}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {services.map((service, index) => (
+            <Card key={index} className="bg-white/5 border-white/10 hover:bg-white/10 transition-all duration-300">
+              <CardHeader>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-4">
+                    {service.icon}
+                    <div>
+                      <CardTitle className="text-white text-xl">
+                        {service.title}
+                      </CardTitle>
+                      <Badge variant="secondary" className="mt-2">
+                        {service.category}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-white/70">
+                  {service.description}
+                </p>
+              </CardHeader>
+              
+              <CardContent>
+                <div className="space-y-3">
+                  <h4 className="text-white font-semibold">Key Features:</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {service.features.map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-center space-x-2">
+                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                        <span className="text-white/80 text-sm">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* CTA Section */}
+        <div className="mt-20 text-center bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-2xl p-12">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Ready to Power Your Project?
+          </h2>
+          <p className="text-xl text-white/70 mb-8 max-w-2xl mx-auto">
+            Contact our team of experts to discuss your electrical infrastructure needs 
+            and discover how we can help bring your vision to life.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+              Request Consultation
+            </button>
+            <button className="border border-white/20 text-white hover:bg-white/10 px-8 py-3 rounded-lg font-semibold transition-colors">
+              Download Brochure
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
