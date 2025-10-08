@@ -12,6 +12,7 @@ import { ServicesPage } from "./pages/ServicesPage";
 import { GalleryPage } from "./pages/GalleryPage";
 import { ContactPage } from "./pages/ContactPage";
 import { AboutPage } from "./pages/AboutPage";
+import Login from "./pages/Login";
 
 export default function App() {
   return (
@@ -26,6 +27,10 @@ export default function App() {
               <Route path="/gallery" element={<GalleryPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/about" element={<AboutPage />} />
+
+              {/* for admin */}
+              <Route path="/login" element={<Login />} />
+
               {/* Handle preview_page.html specifically */}
               <Route
                 path="/preview_page.html"
