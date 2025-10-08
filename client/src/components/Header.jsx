@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import { Button } from "./ui/button";
+import Lottie from "lottie-react";
+import Green from "../assets/green.json";
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
@@ -28,7 +30,7 @@ export function Header() {
             to="/"
             className="text-2xl font-bold text-white hover:text-green-400 transition-colors"
           >
-            GreenCo
+            <Lottie animationData={Green} />
           </Link>
 
           {/* Desktop Navigation */}
