@@ -10,6 +10,9 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { toast } from "sonner";
+import { useContactStore } from "../store/contactStore";
+import Lottie from "lottie-react";
+import loader2 from "../assets/loader2.json";
 
 export function ContactPage() {
   const [formData, setFormData] = useState({
@@ -20,24 +23,31 @@ export function ContactPage() {
     message: "",
   });
 
+  const { sendContactMessage, loading } = useContactStore();
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Mock form submission
-    toast.success(
-      "Message sent successfully! We'll get back to you within 24 hours."
-    );
-    setFormData({
-      name: "",
-      email: "",
-      company: "",
-      subject: "",
-      message: "",
-    });
+
+    try {
+      const res = await sendContactMessage(formData);
+
+      toast.success(res.message);
+
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        subject: "",
+        message: "",
+      });
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const contactInfo = [
@@ -60,7 +70,19 @@ export function ContactPage() {
 
   return (
     <div className="min-h-screen py-20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/50">
+          <div className="w-40 h-40">
+            <Lottie animationData={loader2} loop={true} />
+          </div>
+        </div>
+      )}
+
+      <div
+        className={`container mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
+          loading ? "blur-sm pointer-events-none select-none" : ""
+        }`}
+      >
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6">
@@ -228,11 +250,13 @@ export function ContactPage() {
 
                   <Button
                     type="submit"
-                    className="w-full bg-green-500 hover:bg-green-600 text-white"
+                    disabled={loading}
+                    className="w-full cursor-pointer bg-green-500 hover:bg-green-600 text-white"
                     size="lg"
                   >
-                    <Send className="w-5 h-5 mr-2" />
-                    Send Message
+                    <>
+                      <Send className="w-5 h-5 mr-2" /> Send Message
+                    </>
                   </Button>
                 </form>
               </CardContent>
