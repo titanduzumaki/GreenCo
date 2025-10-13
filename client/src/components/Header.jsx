@@ -17,6 +17,7 @@ export function Header() {
     { path: "/gallery", label: "Gallery" },
     { path: "/about", label: "About" },
     { path: "/contact", label: "Contact" },
+    { path: "/login", label: "Admin"}
   ];
 
   return (
