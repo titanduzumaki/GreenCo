@@ -13,7 +13,7 @@ import { Footer } from "./components/Footer";
 // Pages
 import { HomePage } from "./pages/HomePage";
 import { ServicesPage } from "./pages/ServicesPage";
-// import { GalleryPage } from "./pages/GalleryPage";
+
 import { ContactPage } from "./pages/ContactPage";
 import { AboutPage } from "./pages/AboutPage";
 import Login from "./pages/Login";
@@ -24,11 +24,13 @@ import AdminLayout from "./components/AdminLayout";
 import { DashboardPage } from "./pages/admin/DashboardPage";
 import { MediaLibraryPage } from "./pages/admin/MediaLibraryPage";
 import UploadImagesPage from "./pages/admin/UploadImagesPage";
-import GalleryPage from "./pages/admin/GalleryPage";
+
 import { ContentManagementPage } from "./pages/admin/ContentManagementPage";
 import { SiteSettingsPage } from "./pages/admin/SiteSettingsPage";
 import { ChangePasswordPage } from "./pages/admin/ChangePasswordPage";
 import AdminManagementPage from "./pages/admin/AdminManagementPage";
+import { UsersGalleryPage } from "./pages/GalleryPage";
+import GalleryPage from "./pages/admin/GalleryPage";
 
 export default function App() {
   return (
@@ -66,7 +68,7 @@ export default function App() {
               <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
                 <Header />
                 <main>
-                  <GalleryPage />
+                  <UsersGalleryPage />
                 </main>
                 <Footer />
               </div>
