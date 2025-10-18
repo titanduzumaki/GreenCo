@@ -9,7 +9,6 @@ export const usePhotoStore = create((set) => ({
   fullImage: null, // For modal full image
   fullLoading: false,
 
-  // Fetch only thumbnails/meta for gallery grid
   fetchThumbnails: async () => {
     try {
       set({ loading: true });
@@ -22,7 +21,6 @@ export const usePhotoStore = create((set) => ({
     }
   },
 
-  // Fetch full image data by id for modal
   fetchFullImage: async (id) => {
     if (!id) return;
     set({ fullLoading: true, fullImage: null });
@@ -66,27 +64,27 @@ export const usePhotoStore = create((set) => ({
     }
   },
 
-  // deletePhotoById: async (id) => {
-  //   try {
-  //     if (!id) return null;
+  deletePhotoById: async (id) => {
+    try {
+      if (!id) return null;
 
-  //     set({ loading: true });
+      set({ loading: true });
 
-  //     await axiosInstance.delete(`/images/delete/${id}`);
+      await axiosInstance.delete(`/images/delete/${id}`);
 
-  //     set((state) => ({
-  //       photos: state.photos.filter((p) => p._id !== id),
-  //       loading: false,
-  //       needsRefresh: true,
-  //     }));
+      set((state) => ({
+        photos: state.photos.filter((p) => p._id !== id),
+        loading: false,
+        needsRefresh: true,
+      }));
 
-  //     toast.success("Photo deleted successfully.");
-  //   } catch (error) {
-  //     console.log(error);
-  //     toast.error("Failed to delete photo");
-  //     set({ loading: false });
-  //   }
-  // },
+      toast.success("Photo deleted successfully.");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete photo");
+      set({ loading: false });
+    }
+  },
 
   deletePhotosByIds: async (ids) => {
     if (!ids || ids.length === 0) return;
