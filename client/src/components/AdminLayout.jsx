@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { useTheme } from './ThemeProvider';
-import { Button } from './ui/button';
+import { useState } from "react";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { useTheme } from "./ThemeProvider";
+import { Button } from "./ui/button";
 import {
   LayoutDashboard,
   Image,
@@ -15,7 +15,8 @@ import {
   X,
   LogOut,
   User,
-} from 'lucide-react';
+  Upload,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,8 +24,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu';
-import { Avatar, AvatarFallback } from './ui/avatar';
+} from "./ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "./ui/avatar";
 
 export default function AdminLayout() {
   const { theme, toggleTheme } = useTheme();
@@ -33,25 +34,28 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
-    { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/admin/media', label: 'Media Library', icon: Image },
-    { path: '/admin/content', label: 'Content', icon: FileText },
-    { path: '/admin/settings', label: 'Settings', icon: Settings },
-    { path: '/admin/users', label: 'Admin Users', icon: Users },
-    { path: '/admin/password', label: 'Change Password', icon: Lock },
+    { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
+    { path: "/admin/upload", label: "Upload Images", icon: Upload },
+    { path: "/admin/gallery", label: "Gallery", icon: Image },
+    { path: "/admin/content", label: "Content", icon: FileText },
+    { path: "/admin/settings", label: "Settings", icon: Settings },
+    { path: "/admin/users", label: "Admin Users", icon: Users },
+    { path: "/admin/password", label: "Change Password", icon: Lock },
   ];
 
   const isActive = (path) =>
-    location.pathname === path || location.pathname.startsWith(path + '/');
+    location.pathname === path || location.pathname.startsWith(path + "/");
 
-  const handleLogout = () => navigate('/');
+  const handleLogout = () => navigate("/");
 
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white">
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 w-64 transform bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-transform duration-300
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
+        ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0`}
       >
         <div className="p-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2">
@@ -82,8 +86,8 @@ export default function AdminLayout() {
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                   active
-                    ? 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    ? "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
                 }`}
                 onClick={() => setSidebarOpen(false)}
               >
@@ -123,7 +127,7 @@ export default function AdminLayout() {
               onClick={toggleTheme}
               className="text-slate-600 dark:text-slate-400"
             >
-              {theme === 'dark' ? (
+              {theme === "dark" ? (
                 <Sun className="w-5 h-5" />
               ) : (
                 <Moon className="w-5 h-5" />
@@ -132,7 +136,10 @@ export default function AdminLayout() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                <Button
+                  variant="ghost"
+                  className="relative h-10 w-10 rounded-full"
+                >
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300">
                       AD
@@ -151,14 +158,14 @@ export default function AdminLayout() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onClick={() => navigate('/admin/password')}
+                  onClick={() => navigate("/admin/password")}
                   className="cursor-pointer"
                 >
                   <Lock className="w-4 h-4 mr-2" />
                   Change Password
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate("/")}
                   className="cursor-pointer"
                 >
                   <User className="w-4 h-4 mr-2" />

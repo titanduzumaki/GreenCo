@@ -1,7 +1,13 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { usePhotos } from '../../contexts/PhotoContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
+import { Link, useNavigate } from "react-router-dom";
+import { usePhotoStore } from "../../store/PhotoStore";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
 import {
   Image,
   Eye,
@@ -11,68 +17,70 @@ import {
   Settings,
   TrendingUp,
   Activity,
-} from 'lucide-react';
+} from "lucide-react";
 
 export function DashboardPage() {
-  const { photos, visiblePhotos } = usePhotos();
   const navigate = useNavigate();
+  const photos = usePhotoStore((state) => state.photos);
+  // visiblePhotos: only those with isVisible true
+  const visiblePhotos = photos.filter((p) => p.isVisible);
   const hiddenPhotos = photos.filter((p) => !p.isVisible);
 
   const stats = [
     {
-      title: 'Total Photos',
+      title: "Total Photos",
       value: photos.length,
       icon: Image,
-      color: 'bg-blue-500',
-      description: 'All uploaded media',
+      color: "bg-blue-500",
+      description: "All uploaded media",
     },
     {
-      title: 'Visible Photos',
+      title: "Visible Photos",
       value: visiblePhotos.length,
       icon: Eye,
-      color: 'bg-green-500',
-      description: 'Shown on website',
+      color: "bg-green-500",
+      description: "Shown on website",
     },
     {
-      title: 'Hidden Photos',
+      title: "Hidden Photos",
       value: hiddenPhotos.length,
       icon: EyeOff,
-      color: 'bg-orange-500',
-      description: 'Not displayed',
+      color: "bg-orange-500",
+      description: "Not displayed",
     },
     {
-      title: 'Recent Activity',
-      value: photos.length > 0 ? 'Active' : 'None',
+      title: "Recent Activity",
+      value: photos.length > 0 ? "Active" : "None",
       icon: Activity,
-      color: 'bg-purple-500',
-      description: 'Last 7 days',
+      color: "bg-purple-500",
+      description: "Last 7 days",
     },
   ];
 
   const quickActions = [
     {
-      title: 'Upload Photos',
-      description: 'Add new images to your media library',
+      title: "Upload Images",
+      description: "Add new images to your gallery",
       icon: Upload,
-      link: '/admin/media',
-      color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-50 dark:bg-green-950/30',
+      link: "/admin/upload",
+      color: "text-green-600 dark:text-green-400",
+      bgColor: "bg-green-50 dark:bg-green-950/30",
     },
     {
-      title: 'Manage Content',
-      description: 'Edit website pages and content',
-      icon: FileText,
-      link: '/admin/content',
-      color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-50 dark:bg-blue-950/30',
+      title: "View Gallery",
+      description: "Browse all uploaded images",
+      icon: Image,
+      link: "/admin/gallery",
+      color: "text-blue-600 dark:text-blue-400",
+      bgColor: "bg-blue-50 dark:bg-blue-950/30",
     },
     {
-      title: 'Site Settings',
-      description: 'Configure website preferences',
+      title: "Site Settings",
+      description: "Configure website preferences",
       icon: Settings,
-      link: '/admin/settings',
-      color: 'text-purple-600 dark:text-purple-400',
-      bgColor: 'bg-purple-50 dark:bg-purple-950/30',
+      link: "/admin/settings",
+      color: "text-purple-600 dark:text-purple-400",
+      bgColor: "bg-purple-50 dark:bg-purple-950/30",
     },
   ];
 
@@ -154,7 +162,10 @@ export function DashboardPage() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-slate-900 dark:text-white">Recent Photos</h2>
-            <Button variant="outline" onClick={() => navigate('/admin/media')}>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/admin/gallery")}
+            >
               View All
             </Button>
           </div>
@@ -163,23 +174,18 @@ export function DashboardPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {recentPhotos.map((photo) => (
                   <div
-                    key={photo.id}
+                    key={photo._id}
                     className="group relative aspect-square rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-900"
                   >
                     <img
-                      src={photo.url}
-                      alt={photo.title}
+                      src={photo.thumbnail || photo.url}
+                      alt={photo.title || "Image"}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <p className="text-white text-sm text-center px-2">
-                        {photo.title}
-                      </p>
-                    </div>
                     <div className="absolute top-2 right-2">
                       <div
                         className={`w-2 h-2 rounded-full ${
-                          photo.isVisible ? 'bg-green-500' : 'bg-slate-400'
+                          photo.isVisible ? "bg-green-500" : "bg-slate-400"
                         }`}
                       />
                     </div>
@@ -200,14 +206,14 @@ export function DashboardPage() {
             </div>
             <h3 className="text-slate-900 dark:text-white mb-2">Get Started</h3>
             <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
-              Start building your website by uploading photos to your media library.
+              Start building your website by uploading photos to your gallery.
             </p>
             <Button
-              onClick={() => navigate('/admin/media')}
+              onClick={() => navigate("/admin/upload")}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
               <Upload className="w-4 h-4 mr-2" />
-              Upload Photos
+              Upload Images
             </Button>
           </CardContent>
         </Card>
@@ -241,7 +247,7 @@ export function DashboardPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.open('/', '_blank')}
+                onClick={() => window.open("/", "_blank")}
               >
                 View Site
               </Button>
@@ -250,9 +256,9 @@ export function DashboardPage() {
             {visiblePhotos.length > 0 && (
               <div className="p-4 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900">
                 <p className="text-sm text-green-800 dark:text-green-300">
-                  <strong>{visiblePhotos.length}</strong>{' '}
-                  photo{visiblePhotos.length !== 1 ? 's are' : ' is'} currently
-                  visible on your website's gallery.
+                  <strong>{visiblePhotos.length}</strong> photo
+                  {visiblePhotos.length !== 1 ? "s are" : " is"} currently
+                  visible in your gallery.
                 </p>
               </div>
             )}
