@@ -87,16 +87,12 @@ export default function UploadImagesPage() {
     setIsUploading(true);
     try {
       await uploadPhotos(selectedFiles);
-      toast.success(
-        `Successfully uploaded ${selectedFiles.length} image${
-          selectedFiles.length > 1 ? "s" : ""
-        }`
-      );
+
       previewUrls.forEach((preview) => URL.revokeObjectURL(preview.url));
       setSelectedFiles([]);
       setPreviewUrls([]);
-    } catch {
-      toast.error("Upload failed. Please try again.");
+    } catch (err) {
+      console.log(err);
     } finally {
       setIsUploading(false);
     }

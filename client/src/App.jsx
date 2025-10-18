@@ -29,7 +29,6 @@ import { ContentManagementPage } from "./pages/admin/ContentManagementPage";
 import { SiteSettingsPage } from "./pages/admin/SiteSettingsPage";
 import { ChangePasswordPage } from "./pages/admin/ChangePasswordPage";
 import AdminManagementPage from "./pages/admin/AdminManagementPage";
-import { Toaster } from "./components/ui/sonner";
 
 export default function App() {
   return (
@@ -120,7 +119,6 @@ export default function App() {
           {/* Catch-all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <Toaster />
       </Router>
     </ThemeProvider>
   );

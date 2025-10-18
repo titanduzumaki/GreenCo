@@ -11,7 +11,6 @@ import { Eye, ImageIcon, Trash2 } from "lucide-react";
 import Lottie from "lottie-react";
 import loader2 from "../../assets/loader2.json";
 import picLoader from "../../assets/picLoader.json";
-import { toast } from "sonner";
 
 export default function GalleryPage() {
   const photos = usePhotoStore((state) => state.photos);
@@ -56,10 +55,8 @@ export default function GalleryPage() {
       setDeleting(true);
       setRemovingIds((prev) => [...prev, photo._id]);
       await deletePhotoById(photo._id);
-      toast.success("Photo deleted successfully!");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to delete photo");
     } finally {
       setDeleting(false);
       setRemovingIds((prev) => prev.filter((id) => id !== photo._id));
@@ -74,11 +71,10 @@ export default function GalleryPage() {
       setDeleting(true);
       setRemovingIds([...selectedPhotos]);
       await deletePhotosByIds(selectedPhotos);
-      toast.success(`${selectedPhotos.length} photo(s) deleted`);
+
       setSelectedPhotos([]);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to delete selected photos");
     } finally {
       setDeleting(false);
       setRemovingIds([]);
