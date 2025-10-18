@@ -37,8 +37,8 @@ export default function UploadImagesPage() {
         toast.error(`${file.name} is not an image file`);
         continue;
       }
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error(`${file.name} is too large (max 10MB)`);
+      if (file.size > 100 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 100MB)`);
         continue;
       }
       validFiles.push(file);
@@ -142,7 +142,7 @@ export default function UploadImagesPage() {
                 or click to browse from your computer
               </p>
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
-                Supports: JPG, PNG, GIF, WebP (Max 10MB per file)
+                Supports: JPG, PNG, GIF, WebP (Max 100MB per file)
               </p>
             </div>
           </div>

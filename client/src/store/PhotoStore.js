@@ -2,19 +2,37 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import { toast } from "sonner";
 
-export const usePhotoStore = create((set, get) => ({
-  photos: [],
+export const usePhotoStore = create((set) => ({
+  photos: [], // Thumbnails and meta
   loading: false,
+  needsRefresh: false,
+  fullImage: null, // For modal full image
+  fullLoading: false,
 
-  fetchPhotos: async () => {
+  // Fetch only thumbnails/meta for gallery grid
+  fetchThumbnails: async () => {
     try {
       set({ loading: true });
-      const res = await axiosInstance.get("/images/get-images");
-      set({ photos: res.data.data || [], loading: false });
+      const res = await axiosInstance.get("/images/get-image-thumbnails");
+      set({ photos: res.data.data || [], loading: false, needsRefresh: false });
     } catch (err) {
       console.error(err);
-      toast.error("Failed to load photos");
+      toast.error("Failed to load images");
       set({ loading: false });
+    }
+  },
+
+  // Fetch full image data by id for modal
+  fetchFullImage: async (id) => {
+    if (!id) return;
+    set({ fullLoading: true, fullImage: null });
+    try {
+      const res = await axiosInstance.get(`/images/get-image/${id}`);
+      set({ fullImage: res.data.data, fullLoading: false });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load image");
+      set({ fullImage: null, fullLoading: false });
     }
   },
 
@@ -36,6 +54,8 @@ export const usePhotoStore = create((set, get) => ({
         loading: false,
       }));
 
+      set({ needsRefresh: true });
+
       toast.success(
         `Uploaded ${uploaded.length} image${uploaded.length > 1 ? "s" : ""}`
       );
@@ -46,14 +66,50 @@ export const usePhotoStore = create((set, get) => ({
     }
   },
 
-  deletePhoto: async (public_id) => {
+  // deletePhotoById: async (id) => {
+  //   try {
+  //     if (!id) return null;
+
+  //     set({ loading: true });
+
+  //     await axiosInstance.delete(`/images/delete/${id}`);
+
+  //     set((state) => ({
+  //       photos: state.photos.filter((p) => p._id !== id),
+  //       loading: false,
+  //       needsRefresh: true,
+  //     }));
+
+  //     toast.success("Photo deleted successfully.");
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error("Failed to delete photo");
+  //     set({ loading: false });
+  //   }
+  // },
+
+  deletePhotosByIds: async (ids) => {
+    if (!ids || ids.length === 0) return;
+
     try {
+      set({ loading: true });
+
+      // Call delete endpoint for multiple IDs
+      await Promise.all(
+        ids.map((id) => axiosInstance.delete(`/images/delete/${id}`))
+      );
+
       set((state) => ({
-        photos: state.photos.filter((p) => p.public_id !== public_id),
+        photos: state.photos.filter((p) => !ids.includes(p._id)),
+        loading: false,
+        needsRefresh: true,
       }));
-      toast.success("Photo deleted");
+
+      toast.success(`${ids.length} photo${ids.length > 1 ? "s" : ""} deleted`);
     } catch (err) {
-      toast.error("Failed to delete photo");
+      console.error(err);
+      toast.error("Failed to delete selected photos");
+      set({ loading: false });
     }
   },
 
@@ -64,4 +120,6 @@ export const usePhotoStore = create((set, get) => ({
       ),
     }));
   },
+
+  setNeedsRefresh: (value) => set({ needsRefresh: value }),
 }));

@@ -9,6 +9,7 @@ const ImageSchema = new mongoose.Schema(
     thumbnail: {
       type: String,
     },
+    public_id: { type: String, required: true },
     tags: [String],
     isVisible: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now },

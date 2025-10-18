@@ -19,13 +19,22 @@ export const uploadOnCloudinary = async (localfilepPath) => {
       })
       .catch((err) => console.log(err));
 
-    console.log(uploadResult);
-    console.log("File is uploaded successfully.", uploadResult.url);
+    // console.log(uploadResult);
+    // console.log("File is uploaded successfully.", uploadResult.url);
 
     return uploadResult;
   } catch (error) {
     console.error("Cloudinary Upload Error:", error);
     fs.unlinkSync(localfilepPath);
     return null;
+  }
+};
+
+export const deleteFromCloudinary = async (public_id) => {
+  try {
+    const del = await cloudinary.uploader.destroy(public_id);
+    console.log("Deleted!", del);
+  } catch (error) {
+    console.log("Error in deleting image from cloudinary.", error);
   }
 };
