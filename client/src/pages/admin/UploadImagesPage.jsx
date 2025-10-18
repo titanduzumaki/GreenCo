@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { usePhotoStore } from "../../store/PhotoStore";
 import { Button } from "../../components/ui/button";
 import {
@@ -8,7 +8,6 @@ import {
   Eye,
   FileImage,
   CheckCircle2,
-  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -18,53 +17,40 @@ import {
   DialogTitle,
 } from "../../components/ui/dialog";
 
-export function MediaLibraryPage() {
+export default function UploadImagesPage() {
   const fileInputRef = useRef(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
-  const { uploadPhotos, fetchPhotos, photos, loading } = usePhotoStore();
-
-  const PREVIEW_THRESHOLD = 5; // Show preview grid only for 5 or fewer images
+  const { uploadPhotos } = usePhotoStore();
+  const PREVIEW_THRESHOLD = 5;
 
   const handleFileSelect = (files) => {
     if (!files || files.length === 0) return;
-
     const validFiles = [];
     const previews = [];
-
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-
-      // Validate file type
       if (!file.type.startsWith("image/")) {
         toast.error(`${file.name} is not an image file`);
         continue;
       }
-
-      // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         toast.error(`${file.name} is too large (max 10MB)`);
         continue;
       }
-
       validFiles.push(file);
-
-      // Create preview URL
       const previewUrl = URL.createObjectURL(file);
       previews.push({
         id: Date.now() + i,
-        file: file,
+        file,
         url: previewUrl,
         name: file.name,
       });
     }
-
     if (validFiles.length === 0) return;
-
     setSelectedFiles([...selectedFiles, ...validFiles]);
     setPreviewUrls([...previewUrls, ...previews]);
   };
@@ -73,43 +59,32 @@ export function MediaLibraryPage() {
     e.preventDefault();
     setIsDragging(true);
   };
-
   const handleDragLeave = (e) => {
     e.preventDefault();
     setIsDragging(false);
   };
-
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
     handleFileSelect(e.dataTransfer.files);
   };
-
   const removePreview = (id) => {
     const preview = previewUrls.find((p) => p.id === id);
-    if (preview) {
-      URL.revokeObjectURL(preview.url);
-    }
-
-    const newPreviews = previewUrls.filter((p) => p.id !== id);
-    setPreviewUrls(newPreviews);
-
-    const fileIndex = selectedFiles.findIndex((f) => f.name === preview.name);
+    if (preview) URL.revokeObjectURL(preview.url);
+    setPreviewUrls(previewUrls.filter((p) => p.id !== id));
+    const fileIndex = selectedFiles.findIndex((f) => f.name === preview?.name);
     if (fileIndex !== -1) {
       const newFiles = [...selectedFiles];
       newFiles.splice(fileIndex, 1);
       setSelectedFiles(newFiles);
     }
   };
-
   const handleUpload = async () => {
     if (selectedFiles.length === 0) {
       toast.error("Please select images to upload");
       return;
     }
-
     setIsUploading(true);
-
     try {
       await uploadPhotos(selectedFiles);
       toast.success(
@@ -117,11 +92,7 @@ export function MediaLibraryPage() {
           selectedFiles.length > 1 ? "s" : ""
         }`
       );
-
-      // Clean up preview URLs
       previewUrls.forEach((preview) => URL.revokeObjectURL(preview.url));
-
-      // Reset state
       setSelectedFiles([]);
       setPreviewUrls([]);
     } catch {
@@ -130,49 +101,34 @@ export function MediaLibraryPage() {
       setIsUploading(false);
     }
   };
-
   const handleCancel = () => {
-    // Clean up preview URLs
     previewUrls.forEach((preview) => URL.revokeObjectURL(preview.url));
-
-    // Reset state
     setSelectedFiles([]);
     setPreviewUrls([]);
     toast.info("Upload cancelled");
   };
 
-  useEffect(() => {
-    fetchPhotos();
-  }, [fetchPhotos]);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-6">
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
-            Media Library
+            Upload Images
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
-            Upload and manage your images
+            Select and upload images to your gallery
           </p>
         </div>
-
-        {/* Drag & Drop Zone */}
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`
-            relative border-2 border-dashed rounded-2xl p-12 
-            transition-all duration-300 cursor-pointer
-            ${
-              isDragging
-                ? "border-green-500 bg-green-50/50 dark:bg-green-950/20 scale-105"
-                : "border-slate-300 dark:border-slate-600 hover:border-green-400 dark:hover:border-green-500 hover:bg-slate-50 dark:hover:bg-slate-800/50"
-            }
-          `}
+          className={`relative border-2 border-dashed rounded-2xl p-12 transition-all duration-300 cursor-pointer ${
+            isDragging
+              ? "border-green-500 bg-green-50/50 dark:bg-green-950/20 scale-105"
+              : "border-slate-300 dark:border-slate-600 hover:border-green-400 dark:hover:border-green-500 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+          }`}
         >
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="p-4 bg-green-100 dark:bg-green-900/30 rounded-full">
@@ -190,7 +146,6 @@ export function MediaLibraryPage() {
               </p>
             </div>
           </div>
-
           <input
             type="file"
             multiple
@@ -200,8 +155,6 @@ export function MediaLibraryPage() {
             onChange={(e) => handleFileSelect(e.target.files)}
           />
         </div>
-
-        {/* Preview Section - Show only for 5 or fewer images */}
         {previewUrls.length > 0 && previewUrls.length <= PREVIEW_THRESHOLD && (
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 space-y-6">
             <div className="flex items-center justify-between">
@@ -210,8 +163,6 @@ export function MediaLibraryPage() {
                 {previewUrls.length === 1 ? "image" : "images"})
               </h2>
             </div>
-
-            {/* Preview Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {previewUrls.map((preview) => (
                 <div
@@ -224,13 +175,9 @@ export function MediaLibraryPage() {
                     alt={preview.name}
                     className="w-full h-full object-cover"
                   />
-
-                  {/* View icon overlay */}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <Eye className="w-8 h-8 text-white" />
                   </div>
-
-                  {/* Remove button */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -241,8 +188,6 @@ export function MediaLibraryPage() {
                   >
                     <X className="w-4 h-4" />
                   </button>
-
-                  {/* File name overlay */}
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <p className="text-xs text-white truncate">
                       {preview.name}
@@ -251,8 +196,6 @@ export function MediaLibraryPage() {
                 </div>
               ))}
             </div>
-
-            {/* Action Buttons */}
             <div className="flex gap-4 justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
               <Button
                 onClick={handleCancel}
@@ -285,11 +228,8 @@ export function MediaLibraryPage() {
             </div>
           </div>
         )}
-
-        {/* Bulk Upload Summary - Show for more than 5 images */}
         {previewUrls.length > PREVIEW_THRESHOLD && (
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 space-y-6">
-            {/* Summary Header */}
             <div className="flex items-center justify-center space-x-4">
               <div className="p-4 bg-green-100 dark:bg-green-900/30 rounded-full">
                 <FileImage className="w-12 h-12 text-green-600 dark:text-green-400" />
@@ -303,8 +243,6 @@ export function MediaLibraryPage() {
                 </p>
               </div>
             </div>
-
-            {/* File List Summary */}
             <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-4 max-h-48 overflow-y-auto">
               <div className="space-y-2">
                 {previewUrls.slice(0, 10).map((preview) => (
@@ -350,8 +288,6 @@ export function MediaLibraryPage() {
                 )}
               </div>
             </div>
-
-            {/* Stats */}
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="p-3 bg-slate-100 dark:bg-slate-900/50 rounded-lg">
                 <p className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -382,8 +318,6 @@ export function MediaLibraryPage() {
                 </p>
               </div>
             </div>
-
-            {/* Action Buttons */}
             <div className="flex gap-4 justify-center pt-4 border-t border-slate-200 dark:border-slate-700">
               <Button
                 onClick={handleCancel}
@@ -415,8 +349,6 @@ export function MediaLibraryPage() {
             </div>
           </div>
         )}
-
-        {/* Empty State */}
         {previewUrls.length === 0 && (
           <div className="text-center py-12">
             <div className="inline-flex p-6 bg-slate-200 dark:bg-slate-700 rounded-full mb-4">
@@ -427,58 +359,6 @@ export function MediaLibraryPage() {
             </p>
           </div>
         )}
-
-        {/* Uploaded Images Section */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 mt-10">
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6">
-            Uploaded Images
-          </h2>
-
-          {loading ? (
-            <p className="text-center text-slate-500">Loading images...</p>
-          ) : photos.length === 0 ? (
-            <p className="text-center text-slate-500">
-              No images uploaded yet.
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {photos.map((photo) => (
-                <div
-                  key={photo._id}
-                  className="relative group aspect-square rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 shadow-md hover:shadow-xl transition-shadow"
-                >
-                  <img
-                    src={photo.thumbnail}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-
-                  {/* Hover actions */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(photo.url, "_blank")}
-                      className="bg-white/20 text-white hover:bg-white/30"
-                    >
-                      View
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => deletePhoto(photo._id)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Image Preview Modal */}
         <Dialog
           open={!!selectedImage}
           onOpenChange={() => setSelectedImage(null)}

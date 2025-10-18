@@ -6,11 +6,10 @@ export const usePhotoStore = create((set, get) => ({
   photos: [],
   loading: false,
 
-  // ✅ Fetch all photos (optional if you save URLs in DB)
   fetchPhotos: async () => {
     try {
       set({ loading: true });
-      const res = await axiosInstance.get("/photos");
+      const res = await axiosInstance.get("/images/get-images");
       set({ photos: res.data.data || [], loading: false });
     } catch (err) {
       console.error(err);
@@ -19,7 +18,6 @@ export const usePhotoStore = create((set, get) => ({
     }
   },
 
-  // ✅ Upload images to backend -> Cloudinary
   uploadPhotos: async (files) => {
     if (!files || files.length === 0) return;
 
@@ -28,7 +26,7 @@ export const usePhotoStore = create((set, get) => ({
 
     try {
       set({ loading: true });
-      const res = await axiosInstance.post("/upload-images", formData, {
+      const res = await axiosInstance.post("/images/upload-images", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -48,7 +46,6 @@ export const usePhotoStore = create((set, get) => ({
     }
   },
 
-  // ✅ Delete photo (optional: add API delete call later)
   deletePhoto: async (public_id) => {
     try {
       set((state) => ({
@@ -60,7 +57,6 @@ export const usePhotoStore = create((set, get) => ({
     }
   },
 
-  // ✅ Toggle visibility for admin usage
   toggleVisibility: (id) => {
     set((state) => ({
       photos: state.photos.map((p) =>

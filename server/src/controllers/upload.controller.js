@@ -1,5 +1,6 @@
 import fs from "fs";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import Image from "../models/Image.js";
 
 export const uploadImages = async (req, res) => {
   try {
@@ -17,14 +18,15 @@ export const uploadImages = async (req, res) => {
       fs.unlinkSync(file.path);
 
       if (result) {
-        uploadResults.push({
-          original: result.secure_url,
+        const newImage = await Image.create({
+          url: result.secure_url,
           thumbnail: result.secure_url.replace(
             "/upload/",
             "/upload/w_300,q_auto/"
           ),
           public_id: result.public_id,
         });
+        uploadResults.push(newImage);
       }
     }
 
