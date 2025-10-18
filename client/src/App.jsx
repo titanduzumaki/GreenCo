@@ -19,7 +19,7 @@ import { AboutPage } from "./pages/AboutPage";
 import Login from "./pages/Login";
 
 // Admin
-import { PhotoProvider } from "./contexts/PhotoContext";
+
 import AdminLayout from "./components/AdminLayout";
 import { DashboardPage } from "./pages/admin/DashboardPage";
 import { MediaLibraryPage } from "./pages/admin/MediaLibraryPage";

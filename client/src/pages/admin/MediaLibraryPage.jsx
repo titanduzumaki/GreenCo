@@ -46,8 +46,8 @@ export function MediaLibraryPage() {
       }
 
       // Validate file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error(`${file.name} is too large (max 10MB)`);
+      if (file.size > 100 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 100MB)`);
         continue;
       }
 

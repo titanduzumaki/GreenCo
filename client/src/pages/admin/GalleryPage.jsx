@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { usePhotoStore } from "../../store/PhotoStore";
 import { Button } from "../../components/ui/button";
 import {
   Dialog,
@@ -6,46 +7,31 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../components/ui/dialog";
-import { Eye, ImageIcon } from "lucide-react";
-import { axiosInstance } from "../../lib/axios";
+import { Eye, ImageIcon, Trash2 } from "lucide-react";
 import Lottie from "lottie-react";
-
 import loader2 from "../../assets/loader2.json";
 import picLoader from "../../assets/picLoader.json";
 
 export default function GalleryPage() {
-  const [images, setImages] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const photos = usePhotoStore((state) => state.photos);
+  const loading = usePhotoStore((state) => state.loading);
+  const fetchThumbnails = usePhotoStore((state) => state.fetchThumbnails);
+  const fetchFullImage = usePhotoStore((state) => state.fetchFullImage);
+  const fullImage = usePhotoStore((state) => state.fullImage);
+  const fullLoading = usePhotoStore((state) => state.fullLoading);
+  const deletePhotoById = usePhotoStore((state) => state.deletePhotoById);
   const [selectedImage, setSelectedImage] = useState(null);
-  const [fullImage, setFullImage] = useState(null);
-  const [fullLoading, setFullLoading] = useState(false);
+  const [photoToDelete, setPhotoToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    const fetchThumbnails = async () => {
-      setLoading(true);
-      try {
-        const res = await axiosInstance.get("/images/get-images");
-        setImages(res.data.data || []);
-      } catch {
-        setImages([]);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchThumbnails();
+    // eslint-disable-next-line
   }, []);
 
-  const handleThumbnailClick = async (img) => {
+  const handleThumbnailClick = (img) => {
     setSelectedImage(img);
-    setFullLoading(true);
-    try {
-      const res = await axiosInstance.get(`/images/get-image/${img._id}`);
-      setFullImage(res.data.data);
-    } catch {
-      setFullImage(null);
-    } finally {
-      setFullLoading(false);
-    }
+    fetchFullImage(img._id);
   };
 
   return (
@@ -65,7 +51,7 @@ export default function GalleryPage() {
             />
             <p className="text-slate-500 mt-4">Loading your images...</p>
           </div>
-        ) : images.length === 0 ? (
+        ) : photos.length === 0 ? (
           <div className="text-center py-20">
             <div className="inline-flex p-8 bg-slate-200 dark:bg-slate-700 rounded-full mb-6 shadow-inner">
               <ImageIcon className="w-20 h-20 text-slate-400 dark:text-slate-500" />
@@ -76,7 +62,7 @@ export default function GalleryPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-            {images.map((img) => (
+            {photos.map((img) => (
               <div
                 key={img._id}
                 onClick={() => handleThumbnailClick(img)}
@@ -88,8 +74,34 @@ export default function GalleryPage() {
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                {/* <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
                   <Eye className="w-10 h-10 text-white" />
+                </div> */}
+
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-4">
+                  {/* View Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleThumbnailClick(img);
+                    }}
+                    className="p-2 rounded-full bg-white/20 hover:bg-white/40 transition"
+                    title="View"
+                  >
+                    <Eye className="w-6 h-6 text-white" />
+                  </button>
+
+                  {/* Delete Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPhotoToDelete(img); // open confirmation dialog
+                    }}
+                    className="p-2 rounded-full bg-red-500/70 hover:bg-red-600 transition"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-6 h-6 text-white" />
+                  </button>
                 </div>
               </div>
             ))}
@@ -101,7 +113,6 @@ export default function GalleryPage() {
           open={!!selectedImage}
           onOpenChange={() => {
             setSelectedImage(null);
-            setFullImage(null);
           }}
         >
           <DialogContent className="max-w-4xl rounded-xl overflow-hidden">
@@ -136,12 +147,66 @@ export default function GalleryPage() {
                 className="cursor-pointer"
                 onClick={() => {
                   setSelectedImage(null);
-                  setFullImage(null);
                 }}
                 variant="outline"
                 size="sm"
               >
                 Close
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={!!photoToDelete}
+          onOpenChange={() => setPhotoToDelete(null)}
+        >
+          <DialogContent className="max-w-md rounded-xl">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-semibold text-slate-800 dark:text-slate-100">
+                Confirm Delete
+              </DialogTitle>
+            </DialogHeader>
+            <p className="text-slate-600 dark:text-slate-400">
+              Are you sure you want to permanently delete this photo?
+            </p>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (!deleting) setPhotoToDelete(null);
+                }}
+                disabled={deleting}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                variant="destructive"
+                disabled={deleting}
+                onClick={async () => {
+                  try {
+                    setDeleting(true);
+                    await deletePhotoById(photoToDelete._id);
+                    setPhotoToDelete(null);
+                  } catch (err) {
+                    console.error(err);
+                  } finally {
+                    setDeleting(false);
+                  }
+                }}
+              >
+                {deleting ? (
+                  <Lottie
+                    animationData={loader2}
+                    loop
+                    style={{ width: "28px", height: "28px" }}
+                  />
+                ) : (
+                  "Delete"
+                )}
               </Button>
             </div>
           </DialogContent>

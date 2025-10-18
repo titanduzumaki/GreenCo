@@ -18,13 +18,26 @@ import {
   TrendingUp,
   Activity,
 } from "lucide-react";
+import { useEffect } from "react";
 
 export function DashboardPage() {
   const navigate = useNavigate();
   const photos = usePhotoStore((state) => state.photos);
-  // visiblePhotos: only those with isVisible true
+  const fetchThumbnails = usePhotoStore((state) => state.fetchThumbnails);
+  const needsRefresh = usePhotoStore((state) => state.needsRefresh);
+
   const visiblePhotos = photos.filter((p) => p.isVisible);
   const hiddenPhotos = photos.filter((p) => !p.isVisible);
+
+  useEffect(() => {
+    fetchThumbnails();
+  }, [fetchThumbnails]);
+
+  useEffect(() => {
+    if (needsRefresh) {
+      fetchThumbnails();
+    }
+  }, [needsRefresh, fetchThumbnails]);
 
   const stats = [
     {
