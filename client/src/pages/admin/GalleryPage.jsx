@@ -7,10 +7,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../components/ui/dialog";
-import { Eye, ImageIcon, Trash2 } from "lucide-react";
+import { Eye, ImageIcon, Send, Trash2, Upload } from "lucide-react";
 import Lottie from "lottie-react";
 import loader2 from "../../assets/loader2.json";
 import picLoader from "../../assets/picLoader.json";
+import { useNavigate } from "react-router-dom";
 
 export default function GalleryPage() {
   const photos = usePhotoStore((state) => state.photos);
@@ -30,6 +31,8 @@ export default function GalleryPage() {
   const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);
   const [removingIds, setRemovingIds] = useState([]); // for fade-out animation
   const showcaseLimit = 10;
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchThumbnails();
@@ -132,9 +135,21 @@ export default function GalleryPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-6 text-slate-900 dark:text-white text-center tracking-tight">
-          Media Gallery
-        </h1>
+        <div className="flex  justify-between">
+          <h1 className="text-4xl font-bold mb-6 text-slate-900 dark:text-white text-center tracking-tight">
+            Media Gallery
+          </h1>
+
+          <Button
+            onClick={() => navigate("/admin/upload")}
+            className="cursor-pointer bg-green-500 hover:bg-green-600 text-white"
+            size="lg"
+          >
+            <>
+              <Upload className="w-5 h-5 mr-2" /> Upload
+            </>
+          </Button>
+        </div>
 
         {/* Toolbar */}
         {photos.length > 0 && (
@@ -153,6 +168,7 @@ export default function GalleryPage() {
               <Button
                 variant="secondary"
                 size="sm"
+                className="cursor-pointer"
                 disabled={selectedPhotos.length === 0 || loading}
                 onClick={handleShowcaseSelection}
               >
@@ -161,6 +177,7 @@ export default function GalleryPage() {
               <Button
                 variant="outline"
                 size="sm"
+                className="cursor-pointer"
                 disabled={selectedPhotos.length === 0 || loading}
                 onClick={handleClearShowcase}
               >
@@ -169,6 +186,7 @@ export default function GalleryPage() {
               <Button
                 variant="destructive"
                 size="sm"
+                className="cursor-pointer"
                 disabled={selectedPhotos.length === 0 || deleting}
                 onClick={() => setBulkDeleteDialog(true)}
               >

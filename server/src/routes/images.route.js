@@ -2,8 +2,8 @@ import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import {
   deleteImages,
-  fetchAllImages,
   fetchImageThumbnail,
+  fetchRecent4Images,
   fetchShowcasedImages,
   getSingleImage,
   setBulkShowcase,
@@ -16,8 +16,11 @@ const router = Router();
 router.post("/upload-images", upload.array("images", 100), uploadImages);
 router.get("/get-image-thumbnails", fetchImageThumbnail);
 router.get("/get-image/:id", getSingleImage);
-router.get("/getAllImages", fetchAllImages);
+// router.get("/getAllImages", fetchAllImages);
 router.delete("/delete/:id", deleteImages);
+
+//for dashboard
+router.get("/getRecentImage", fetchRecent4Images);
 
 // Showcase endpoints
 router.get("/showcase", fetchShowcasedImages); // public

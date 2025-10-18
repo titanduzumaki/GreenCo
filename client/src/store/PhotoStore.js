@@ -3,10 +3,11 @@ import { axiosInstance } from "../lib/axios";
 import { toast } from "sonner";
 
 export const usePhotoStore = create((set) => ({
-  photos: [], // Thumbnails and meta
+  photos: [],
+  recPhotos: [],
   loading: false,
   needsRefresh: false,
-  fullImage: null, // For modal full image
+  fullImage: null,
   fullLoading: false,
 
   fetchThumbnails: async () => {
@@ -31,6 +32,18 @@ export const usePhotoStore = create((set) => ({
       console.error(err);
       toast.error("Failed to load image");
       set({ fullImage: null, fullLoading: false });
+    }
+  },
+
+  fetchRecentImages: async () => {
+    try {
+      set({ loading: true });
+      const res = await axiosInstance.get("/images/getRecentImage");
+      set({ recPhotos: res.data.data || [], loading: false });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load recent images");
+      set({ loading: false });
     }
   },
 
@@ -142,6 +155,7 @@ export const usePhotoStore = create((set) => ({
       }));
 
       const changed = showcaseIds.length + unshowcaseIds.length;
+
       toast.success(
         `Updated showcase for ${changed} image${changed > 1 ? "s" : ""}`
       );
