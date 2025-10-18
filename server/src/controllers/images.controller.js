@@ -17,6 +17,7 @@ export const uploadImages = async (req, res) => {
 
     for (const file of req.files) {
       const result = await uploadOnCloudinary(file.path);
+      console.log(result);
 
       fs.unlinkSync(file.path);
 

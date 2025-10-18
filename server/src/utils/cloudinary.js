@@ -19,8 +19,8 @@ export const uploadOnCloudinary = async (localfilepPath) => {
       })
       .catch((err) => console.log(err));
 
-    console.log(uploadResult);
-    console.log("File is uploaded successfully.", uploadResult.url);
+    // console.log(uploadResult);
+    // console.log("File is uploaded successfully.", uploadResult.url);
 
     return uploadResult;
   } catch (error) {

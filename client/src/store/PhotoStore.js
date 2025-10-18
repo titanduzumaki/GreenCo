@@ -66,24 +66,49 @@ export const usePhotoStore = create((set) => ({
     }
   },
 
-  deletePhotoById: async (id) => {
-    try {
-      if (!id) return null;
+  // deletePhotoById: async (id) => {
+  //   try {
+  //     if (!id) return null;
 
+  //     set({ loading: true });
+
+  //     await axiosInstance.delete(`/images/delete/${id}`);
+
+  //     set((state) => ({
+  //       photos: state.photos.filter((p) => p._id !== id),
+  //       loading: false,
+  //       needsRefresh: true,
+  //     }));
+
+  //     toast.success("Photo deleted successfully.");
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error("Failed to delete photo");
+  //     set({ loading: false });
+  //   }
+  // },
+
+  deletePhotosByIds: async (ids) => {
+    if (!ids || ids.length === 0) return;
+
+    try {
       set({ loading: true });
 
-      await axiosInstance.delete(`/images/delete/${id}`);
+      // Call delete endpoint for multiple IDs
+      await Promise.all(
+        ids.map((id) => axiosInstance.delete(`/images/delete/${id}`))
+      );
 
       set((state) => ({
-        photos: state.photos.filter((p) => p._id !== id),
+        photos: state.photos.filter((p) => !ids.includes(p._id)),
         loading: false,
         needsRefresh: true,
       }));
 
-      toast.success("Photo deleted successfully.");
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to delete photo");
+      toast.success(`${ids.length} photo${ids.length > 1 ? "s" : ""} deleted`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete selected photos");
       set({ loading: false });
     }
   },
