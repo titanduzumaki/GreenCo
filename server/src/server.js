@@ -4,6 +4,7 @@ import { ENV } from "./lib/env.js";
 import cookieParser from "cookie-parser";
 import authRoute from "./routes/auth.route.js";
 import messageRoute from "./routes/message.route.js";
+import uploadRoute from "./routes/upload.route.js";
 import cors from "cors";
 
 const PORT = ENV.PORT || 4001;
@@ -15,6 +16,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoute);
 app.use("/api/msg", messageRoute);
+app.use("/api/", uploadRoute);
 
 app.get("/test", (req, res) => {
   res.send("server is working fine");

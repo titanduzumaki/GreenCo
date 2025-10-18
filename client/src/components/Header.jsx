@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import { Button } from "./ui/button";
+import Lottie from "lottie-react";
+import welcome from "../assets/Welcome.json";
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
@@ -17,7 +19,7 @@ export function Header() {
     { path: "/gallery", label: "Gallery" },
     { path: "/about", label: "About" },
     { path: "/contact", label: "Contact" },
-    { path: "/login", label: "Admin"}
+    { path: "/login", label: "Admin" },
   ];
 
   return (
@@ -29,6 +31,7 @@ export function Header() {
             to="/"
             className="text-2xl font-bold text-white hover:text-green-400 transition-colors"
           >
+            {/* <Lottie animationData={welcome} /> */}
             GreenCo
           </Link>
 

@@ -27,7 +27,7 @@ import { Toaster } from "./components/ui/sonner";
 export default function App() {
   return (
     <ThemeProvider>
-      <PhotoProvider>
+  
         <Router>
           <Routes>
             {/* Public Pages with Header & Footer */}
@@ -97,9 +97,9 @@ export default function App() {
             <Route
               path="/admin/*"
               element={
-                <PhotoProvider>
+               
                   <AdminLayout />
-                </PhotoProvider>
+                
               }
             >
               <Route index element={<DashboardPage />} />
@@ -118,7 +118,7 @@ export default function App() {
           </Routes>
           <Toaster />
         </Router>
-      </PhotoProvider>
+      
     </ThemeProvider>
   );
 }
