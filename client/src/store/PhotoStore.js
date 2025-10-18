@@ -119,5 +119,38 @@ export const usePhotoStore = create((set) => ({
     }));
   },
 
+  // Bulk set showcase state for selected images
+  setShowcaseBulk: async (showcaseIds = [], unshowcaseIds = []) => {
+    try {
+      // No-op if nothing to change
+      if (showcaseIds.length === 0 && unshowcaseIds.length === 0) return;
+
+      set({ loading: true });
+      await axiosInstance.post("/images/showcase", {
+        showcaseIds,
+        unshowcaseIds,
+      });
+
+      set((state) => ({
+        photos: state.photos.map((p) => {
+          if (showcaseIds.includes(p._id)) return { ...p, isShowcased: true };
+          if (unshowcaseIds.includes(p._id))
+            return { ...p, isShowcased: false };
+          return p;
+        }),
+        loading: false,
+      }));
+
+      const changed = showcaseIds.length + unshowcaseIds.length;
+      toast.success(
+        `Updated showcase for ${changed} image${changed > 1 ? "s" : ""}`
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update showcase selection");
+      set({ loading: false });
+    }
+  },
+
   setNeedsRefresh: (value) => set({ needsRefresh: value }),
 }));

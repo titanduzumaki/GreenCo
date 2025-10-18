@@ -21,6 +21,7 @@ export default function GalleryPage() {
   const fullLoading = usePhotoStore((state) => state.fullLoading);
   const deletePhotoById = usePhotoStore((state) => state.deletePhotoById);
   const deletePhotosByIds = usePhotoStore((state) => state.deletePhotosByIds);
+  const setShowcaseBulk = usePhotoStore((state) => state.setShowcaseBulk);
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [photoToDelete, setPhotoToDelete] = useState(null);
@@ -28,6 +29,7 @@ export default function GalleryPage() {
   const [selectedPhotos, setSelectedPhotos] = useState([]);
   const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);
   const [removingIds, setRemovingIds] = useState([]); // for fade-out animation
+  const showcaseLimit = 10;
 
   useEffect(() => {
     fetchThumbnails();
@@ -82,6 +84,51 @@ export default function GalleryPage() {
     }
   };
 
+  const handleShowcaseSelection = async () => {
+    // Images currently showcased
+    const showcasedIds = photos.filter((p) => p.isShowcased).map((p) => p._id);
+    const toShowcase = selectedPhotos.filter(
+      (id) => !showcasedIds.includes(id)
+    );
+    const toUnshowcase = selectedPhotos.filter((id) =>
+      showcasedIds.includes(id)
+    );
+
+    // Enforce limit on total showcased (optional client-side guard)
+    const totalAfter =
+      showcasedIds.length - toUnshowcase.length + toShowcase.length;
+    if (totalAfter > showcaseLimit) {
+      // Prefer not to import toast here; keep UI minimal
+      alert(
+        `You can showcase up to ${showcaseLimit} images. Currently showcased: ${showcasedIds.length}.`
+      );
+      return;
+    }
+
+    try {
+      await setShowcaseBulk(toShowcase, toUnshowcase);
+      setSelectedPhotos([]);
+    } catch {
+      // handled in store
+    }
+  };
+
+  const handleClearShowcase = async () => {
+    const showcasedIds = photos.filter((p) => p.isShowcased).map((p) => p._id);
+    const toUnshowcase = selectedPhotos.filter((id) =>
+      showcasedIds.includes(id)
+    );
+    if (toUnshowcase.length === 0) return;
+    try {
+      await setShowcaseBulk([], toUnshowcase);
+      setSelectedPhotos((prev) =>
+        prev.filter((id) => !toUnshowcase.includes(id))
+      );
+    } catch {
+      // handled in store
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-8">
       <div className="max-w-6xl mx-auto">
@@ -102,15 +149,32 @@ export default function GalleryPage() {
                 {selectedPhotos.length} selected
               </span>
             </div>
-
-            <Button
-              variant="destructive"
-              size="sm"
-              disabled={selectedPhotos.length === 0 || deleting}
-              onClick={() => setBulkDeleteDialog(true)}
-            >
-              {deleting ? "Deleting..." : "Delete Selected"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={selectedPhotos.length === 0 || loading}
+                onClick={handleShowcaseSelection}
+              >
+                Showcase / Unshowcase
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={selectedPhotos.length === 0 || loading}
+                onClick={handleClearShowcase}
+              >
+                Remove Showcase
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={selectedPhotos.length === 0 || deleting}
+                onClick={() => setBulkDeleteDialog(true)}
+              >
+                {deleting ? "Deleting..." : "Delete Selected"}
+              </Button>
+            </div>
           </div>
         )}
 
@@ -154,6 +218,11 @@ export default function GalleryPage() {
                   }}
                   className="absolute top-2 left-2 w-5 h-5 z-10 cursor-pointer"
                 />
+                {img.isShowcased && (
+                  <span className="absolute top-2 right-2 z-10 text-xs bg-green-500 text-white px-2 py-1 rounded-md shadow">
+                    Showcased
+                  </span>
+                )}
                 <img
                   src={img.thumbnail}
                   alt="thumbnail"
