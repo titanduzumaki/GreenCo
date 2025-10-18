@@ -10,7 +10,7 @@ import {
 
 const router = Router();
 
-router.post("/upload-images", upload.array("images", 50), uploadImages);
+router.post("/upload-images", upload.array("images", 100), uploadImages);
 router.get("/get-image-thumbnails", fetchImageThumbnail);
 router.get("/get-image/:id", getSingleImage);
 router.get("/getAllImages", fetchAllImages);
