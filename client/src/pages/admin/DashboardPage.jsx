@@ -13,7 +13,6 @@ import {
   Eye,
   EyeOff,
   Upload,
-  FileText,
   Settings,
   TrendingUp,
   Activity,
