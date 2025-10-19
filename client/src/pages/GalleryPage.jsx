@@ -6,6 +6,7 @@ import { Badge } from "../components/ui/badge";
 import { axiosInstance } from "../lib/axios";
 import loader2 from "../assets/loader2.json";
 import Lottie from "lottie-react";
+import TiltedCard from "@/components/TiltedCard";
 
 export function UsersGalleryPage() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -119,31 +120,51 @@ export function UsersGalleryPage() {
             No images to display yet.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredImages.map((image, index) => (
               <div
                 key={image.id}
-                className="group cursor-pointer overflow-hidden rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-300"
+                className="group cursor-pointer"
                 onClick={() => openLightbox(index)}
               >
-                <div className="aspect-video overflow-hidden">
-                  <ImageWithFallback
-                    src={image.src}
-                    alt={image.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant="secondary" className="text-xs">
-                      {image.category}
-                    </Badge>
-                  </div>
-                  <h3 className="text-white font-semibold mb-2">
-                    {image.title}
-                  </h3>
-                  <p className="text-white/70 text-sm">{image.description}</p>
-                </div>
+                <TiltedCard
+                  imageSrc={image.src}
+                  altText={image.title || "Project Image"}
+                  captionText={image.title || "View Project"}
+                  containerHeight="350px"
+                  containerWidth="100%"
+                  imageHeight="350px"
+                  imageWidth="100%"
+                  rotateAmplitude={10}
+                  scaleOnHover={1.1}
+                  showMobileWarning={false}
+                  showTooltip={false}
+                  displayOverlayContent={true}
+                  overlayContent={
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent rounded-2xl flex flex-col justify-end p-6">
+                      <div className="space-y-2">
+                        <h3 className="text-white font-semibold text-lg leading-tight">
+                          {image.title || "Project Showcase"}
+                        </h3>
+                        <p className="text-white/80 text-sm line-clamp-2">
+                          {image.description ||
+                            "Click to view full project details and explore our electrical infrastructure work."}
+                        </p>
+                        <div className="flex items-center justify-between mt-4">
+                          <Badge
+                            variant="secondary"
+                            className="bg-green-500/20 text-green-300 border-green-500/30"
+                          >
+                            {image.category}
+                          </Badge>
+                          <div className="text-white/60 text-xs">
+                            View Details →
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                />
               </div>
             ))}
           </div>
@@ -151,11 +172,11 @@ export function UsersGalleryPage() {
 
         {/* Lightbox */}
         {selectedImage !== null && (
-          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <Button
               variant="ghost"
               size="sm"
-              className="absolute top-4 right-4 text-white hover:bg-white/10 z-10"
+              className="absolute top-6 right-6 text-white hover:bg-white/10 z-10 rounded-full p-3"
               onClick={closeLightbox}
             >
               <X size={24} />
@@ -164,7 +185,7 @@ export function UsersGalleryPage() {
             <Button
               variant="ghost"
               size="sm"
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/10 z-10"
+              className="absolute left-6 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/10 z-10 rounded-full p-3"
               onClick={() => navigateImage("prev")}
             >
               <ChevronLeft size={24} />
@@ -173,27 +194,39 @@ export function UsersGalleryPage() {
             <Button
               variant="ghost"
               size="sm"
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/10 z-10"
+              className="absolute right-6 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/10 z-10 rounded-full p-3"
               onClick={() => navigateImage("next")}
             >
               <ChevronRight size={24} />
             </Button>
 
-            <div className="max-w-4xl max-h-full flex flex-col items-center">
-              <div className="relative max-h-[70vh] overflow-hidden rounded-lg">
+            <div className="max-w-5xl max-h-full flex flex-col items-center">
+              <div className="relative max-h-[75vh] overflow-hidden rounded-2xl shadow-2xl">
                 <ImageWithFallback
                   src={filteredImages[selectedImage].src}
                   alt={filteredImages[selectedImage].title}
                   className="max-w-full max-h-full object-contain"
                 />
               </div>
-              <div className="mt-4 text-center">
-                <h3 className="text-white text-xl font-semibold mb-2">
-                  {filteredImages[selectedImage].title}
+              <div className="mt-6 text-center max-w-3xl">
+                <h3 className="text-white text-2xl font-bold mb-3">
+                  {filteredImages[selectedImage].title || "Project Showcase"}
                 </h3>
-                <p className="text-white/70 max-w-2xl">
-                  {filteredImages[selectedImage].description}
+                <p className="text-white/80 text-lg leading-relaxed">
+                  {filteredImages[selectedImage].description ||
+                    "Explore our electrical infrastructure project showcasing innovative solutions and professional craftsmanship."}
                 </p>
+                <div className="mt-4 flex items-center justify-center gap-4">
+                  <Badge
+                    variant="secondary"
+                    className="bg-green-500/20 text-green-300 border-green-500/30 px-4 py-2"
+                  >
+                    {filteredImages[selectedImage].category}
+                  </Badge>
+                  <span className="text-white/60 text-sm">
+                    {selectedImage + 1} of {filteredImages.length}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

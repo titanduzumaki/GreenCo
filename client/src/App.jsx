@@ -9,6 +9,7 @@ import {
 import { ThemeProvider } from "./components/ThemeProvider";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import { PageTransition } from "./components/PageTransition";
 
 // Pages
 import { HomePage } from "./pages/HomePage";
@@ -44,7 +45,9 @@ export default function App() {
               <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
                 <Header />
                 <main>
-                  <HomePage />
+                  <PageTransition>
+                    <HomePage />
+                  </PageTransition>
                 </main>
                 <Footer />
               </div>
@@ -56,7 +59,9 @@ export default function App() {
               <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
                 <Header />
                 <main>
-                  <ServicesPage />
+                  <PageTransition>
+                    <ServicesPage />
+                  </PageTransition>
                 </main>
                 <Footer />
               </div>
@@ -68,7 +73,9 @@ export default function App() {
               <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
                 <Header />
                 <main>
-                  <UsersGalleryPage />
+                  <PageTransition>
+                    <UsersGalleryPage />
+                  </PageTransition>
                 </main>
                 <Footer />
               </div>
@@ -80,7 +87,9 @@ export default function App() {
               <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
                 <Header />
                 <main>
-                  <ContactPage />
+                  <PageTransition>
+                    <ContactPage />
+                  </PageTransition>
                 </main>
                 <Footer />
               </div>
@@ -92,7 +101,9 @@ export default function App() {
               <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
                 <Header />
                 <main>
-                  <AboutPage />
+                  <PageTransition>
+                    <AboutPage />
+                  </PageTransition>
                 </main>
                 <Footer />
               </div>
