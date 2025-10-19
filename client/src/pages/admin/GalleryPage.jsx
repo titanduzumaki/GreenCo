@@ -9,7 +9,7 @@ import {
 } from "../../components/ui/dialog";
 import { Eye, ImageIcon, Send, Trash2, Upload } from "lucide-react";
 import Lottie from "lottie-react";
-import loader2 from "../../assets/loader2.json";
+import loader3 from "../../assets/loader3.json";
 import picLoader from "../../assets/picLoader.json";
 import { useNavigate } from "react-router-dom";
 
@@ -200,7 +200,7 @@ export default function GalleryPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Lottie
-              animationData={loader2}
+              animationData={loader3}
               loop
               style={{ width: "180px", height: "180px" }}
             />

@@ -4,7 +4,7 @@ import { Moon, Sun, Menu, X } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 import { Button } from "./ui/button";
 import Lottie from "lottie-react";
-import welcome from "../assets/Welcome.json";
+import GreenCO from "../assets/Green-CO.json";
 
 export function Header() {
   const { theme, toggleTheme } = useTheme();
@@ -31,8 +31,8 @@ export function Header() {
             to="/"
             className="text-2xl font-bold text-white hover:text-green-400 transition-colors"
           >
-            {/* <Lottie animationData={welcome} /> */}
-            GreenCo
+            <Lottie animationData={GreenCO} />
+            {/* GreenCo */}
           </Link>
 
           {/* Desktop Navigation */}
