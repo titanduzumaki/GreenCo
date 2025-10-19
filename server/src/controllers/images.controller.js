@@ -77,16 +77,16 @@ export const getSingleImage = async (req, res) => {
   }
 };
 
-export const fetchAllImages = async (req, res) => {
+export const fetchRecent4Images = async (req, res) => {
   try {
-    const images = await Image.find({}).sort("ascending");
+    const recentImages = await Image.find({}).sort({ createdAt: -1 }).limit(4);
 
-    res.status(200).json({ success: true, data: images });
+    res.status(200).json({ success: true, data: recentImages });
   } catch (error) {
-    console.log("Errr in fetching all images conrtoller.", error);
+    console.log("Errr in fetching recent image conrtoller.", error);
     res
       .status(500)
-      .json({ success: false, message: "Failed to fetch all images" });
+      .json({ success: false, message: "Failed to fetch recent images" });
   }
 };
 
@@ -112,7 +112,6 @@ export const deleteImages = async (req, res) => {
   }
 };
 
-// Public: get all showcased images (visible to users' gallery)
 export const fetchShowcasedImages = async (req, res) => {
   try {
     const images = await Image.find(
@@ -128,7 +127,6 @@ export const fetchShowcasedImages = async (req, res) => {
   }
 };
 
-// Admin: toggle showcase on a single image
 export const toggleShowcase = async (req, res) => {
   try {
     const { id } = req.params;
@@ -161,7 +159,6 @@ export const toggleShowcase = async (req, res) => {
   }
 };
 
-// Admin: bulk set showcase for an array of image ids. Optional limit enforcement on server side.
 export const setBulkShowcase = async (req, res) => {
   try {
     const { showcaseIds = [], unshowcaseIds = [] } = req.body || {};
@@ -174,10 +171,12 @@ export const setBulkShowcase = async (req, res) => {
     }
 
     // Optionally enforce max 10 showcased at once
-    // const currentCount = await Image.countDocuments({ isShowcased: true });
-    // if (currentCount - unshowcaseIds.length + showcaseIds.length > 10) {
-    //   return res.status(400).json({ success: false, message: "Max 10 showcased images allowed" });
-    // }
+    const currentCount = await Image.countDocuments({ isShowcased: true });
+    if (currentCount - unshowcaseIds.length + showcaseIds.length > 10) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Max 10 showcased images allowed" });
+    }
 
     const ops = [];
     if (showcaseIds.length > 0) {

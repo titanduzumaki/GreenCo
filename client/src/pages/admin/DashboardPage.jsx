@@ -13,7 +13,6 @@ import {
   Eye,
   EyeOff,
   Upload,
-  FileText,
   Settings,
   TrendingUp,
   Activity,
@@ -23,11 +22,16 @@ import { useEffect } from "react";
 export function DashboardPage() {
   const navigate = useNavigate();
   const photos = usePhotoStore((state) => state.photos);
+  const recPhotos = usePhotoStore((state) => state.recPhotos);
   const fetchThumbnails = usePhotoStore((state) => state.fetchThumbnails);
   const needsRefresh = usePhotoStore((state) => state.needsRefresh);
 
+  const fetchRecentImages = usePhotoStore((state) => state.fetchRecentImages);
+
   const visiblePhotos = photos.filter((p) => p.isVisible);
-  const hiddenPhotos = photos.filter((p) => !p.isVisible);
+
+  const showcasedImageLength = photos.filter((p) => p.isShowcased);
+  const recentPhotos = recPhotos;
 
   useEffect(() => {
     fetchThumbnails();
@@ -39,6 +43,10 @@ export function DashboardPage() {
     }
   }, [needsRefresh, fetchThumbnails]);
 
+  useEffect(() => {
+    fetchRecentImages();
+  }, [fetchRecentImages]);
+
   const stats = [
     {
       title: "Total Photos",
@@ -49,14 +57,14 @@ export function DashboardPage() {
     },
     {
       title: "Visible Photos",
-      value: visiblePhotos.length,
+      value: showcasedImageLength.length,
       icon: Eye,
       color: "bg-green-500",
       description: "Shown on website",
     },
     {
       title: "Hidden Photos",
-      value: hiddenPhotos.length,
+      value: photos.length - showcasedImageLength.length,
       icon: EyeOff,
       color: "bg-orange-500",
       description: "Not displayed",
@@ -96,8 +104,6 @@ export function DashboardPage() {
       bgColor: "bg-purple-50 dark:bg-purple-950/30",
     },
   ];
-
-  const recentPhotos = photos.slice(0, 4);
 
   return (
     <div className="space-y-8">
@@ -191,7 +197,7 @@ export function DashboardPage() {
                     className="group relative aspect-square rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-900"
                   >
                     <img
-                      src={photo.thumbnail || photo.url}
+                      src={photo.url}
                       alt={photo.title || "Image"}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
