@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -13,6 +13,15 @@ import { toast } from "sonner";
 import { useContactStore } from "../store/contactStore";
 import Lottie from "lottie-react";
 import loader2 from "../assets/loader2.json";
+import {
+  fadeInUp,
+  fadeInLeft,
+  fadeInRight,
+  scaleIn,
+  textReveal,
+  cardHover,
+  cleanupAnimations,
+} from "../lib/gsapAnimations";
 
 export function ContactPage() {
   const [formData, setFormData] = useState({
@@ -24,6 +33,40 @@ export function ContactPage() {
   });
 
   const { sendContactMessage, loading } = useContactStore();
+
+  const headerRef = useRef(null);
+  const contactInfoRef = useRef(null);
+  const formRef = useRef(null);
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    // Header animation
+    if (headerRef.current) {
+      textReveal(headerRef.current.querySelectorAll("h1, p"));
+    }
+
+    // Contact info section
+    if (contactInfoRef.current) {
+      const infoCards = contactInfoRef.current.querySelectorAll(".info-card");
+      fadeInLeft(infoCards, { stagger: 0.2 });
+      cardHover(infoCards);
+    }
+
+    // Form section
+    if (formRef.current) {
+      fadeInRight([formRef.current]);
+    }
+
+    // Map section
+    if (mapRef.current) {
+      scaleIn([mapRef.current]);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      cleanupAnimations();
+    };
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -84,7 +127,7 @@ export function ContactPage() {
         }`}
       >
         {/* Header */}
-        <div className="text-center mb-16">
+        <div ref={headerRef} className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6">
             Contact{" "}
             <span className="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
@@ -100,8 +143,8 @@ export function ContactPage() {
 
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Contact Information */}
-          <div className="lg:col-span-1">
-            <Card className="bg-white/5 border-white/10 mb-8">
+          <div ref={contactInfoRef} className="lg:col-span-1">
+            <Card className="info-card bg-white/5 border-white/10 mb-8">
               <CardHeader>
                 <CardTitle className="text-white">Get In Touch</CardTitle>
               </CardHeader>
@@ -125,7 +168,7 @@ export function ContactPage() {
             </Card>
 
             {/* Office Hours */}
-            <Card className="bg-white/5 border-white/10">
+            <Card className="info-card bg-white/5 border-white/10">
               <CardHeader>
                 <CardTitle className="text-white">Office Hours</CardTitle>
               </CardHeader>
@@ -154,7 +197,7 @@ export function ContactPage() {
           </div>
 
           {/* Contact Form */}
-          <div className="lg:col-span-2">
+          <div ref={formRef} className="lg:col-span-2">
             <Card className="bg-white/5 border-white/10">
               <CardHeader>
                 <CardTitle className="text-white">Send us a Message</CardTitle>
@@ -265,7 +308,7 @@ export function ContactPage() {
         </div>
 
         {/* Map Section */}
-        <div className="mt-16">
+        <div ref={mapRef} className="mt-16">
           <Card className="bg-white/5 border-white/10">
             <CardHeader>
               <CardTitle className="text-white">Find Our Office</CardTitle>

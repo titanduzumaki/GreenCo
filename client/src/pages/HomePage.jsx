@@ -3,8 +3,57 @@ import { ArrowRight, CheckCircle, Clock, Shield } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { useEffect, useRef } from "react";
+import {
+  fadeInUp,
+  fadeInLeft,
+  fadeInRight,
+  scaleIn,
+  textReveal,
+  imageReveal,
+  cardHover,
+  pageEntrance,
+  cleanupAnimations,
+} from "../lib/gsapAnimations";
 
 export function HomePage() {
+  const heroRef = useRef(null);
+  const servicesRef = useRef(null);
+  const featuresRef = useRef(null);
+  const galleryRef = useRef(null);
+
+  useEffect(() => {
+    // Page entrance animation
+    pageEntrance([heroRef.current]);
+
+    // Services section animations
+    if (servicesRef.current) {
+      const serviceCards =
+        servicesRef.current.querySelectorAll(".service-card");
+      fadeInUp(serviceCards, { stagger: 0.2 });
+      cardHover(serviceCards);
+    }
+
+    // Features section animations
+    if (featuresRef.current) {
+      const featureItems =
+        featuresRef.current.querySelectorAll(".feature-item");
+      scaleIn(featureItems, { stagger: 0.15 });
+    }
+
+    // Gallery section animations
+    if (galleryRef.current) {
+      const galleryImages =
+        galleryRef.current.querySelectorAll(".gallery-image");
+      imageReveal(galleryImages, { stagger: 0.1 });
+    }
+
+    // Cleanup on unmount
+    return () => {
+      cleanupAnimations();
+    };
+  }, []);
+
   const services = [
     {
       title: "Power Grid Infrastructure",
@@ -46,7 +95,7 @@ export function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-20 lg:py-32">
+      <section ref={heroRef} className="relative py-20 lg:py-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
@@ -89,7 +138,7 @@ export function HomePage() {
       </section>
 
       {/* Services Section */}
-      <section className="py-20 bg-black/20">
+      <section ref={servicesRef} className="py-20 bg-black/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
@@ -105,7 +154,7 @@ export function HomePage() {
             {services.map((service, index) => (
               <Card
                 key={index}
-                className="bg-white/5 border-white/10 hover:bg-white/10 transition-all duration-300"
+                className="service-card bg-white/5 border-white/10 hover:bg-white/10 transition-all duration-300"
               >
                 <CardContent className="p-8 text-center">
                   <div className="text-4xl mb-4">{service.icon}</div>
@@ -121,7 +170,7 @@ export function HomePage() {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-20">
+      <section ref={featuresRef} className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
@@ -135,7 +184,7 @@ export function HomePage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="text-center">
+              <div key={index} className="feature-item text-center">
                 <div className="mb-6 flex justify-center">{feature.icon}</div>
                 <h3 className="text-xl font-bold text-white mb-3">
                   {feature.title}
@@ -148,7 +197,7 @@ export function HomePage() {
       </section>
 
       {/* Gallery Preview */}
-      <section className="py-20 bg-black/20">
+      <section ref={galleryRef} className="py-20 bg-black/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
@@ -163,7 +212,7 @@ export function HomePage() {
             {Array.from({ length: 4 }).map((_, index) => (
               <div
                 key={index}
-                className="aspect-square overflow-hidden rounded-lg"
+                className="gallery-image aspect-square overflow-hidden rounded-lg"
               >
                 <ImageWithFallback
                   src={`https://images.unsplash.com/photo-${
