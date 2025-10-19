@@ -4,6 +4,8 @@ import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { axiosInstance } from "../lib/axios";
+import loader2 from "../assets/loader2.json";
+import Lottie from "lottie-react";
 
 export function UsersGalleryPage() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -104,7 +106,14 @@ export function UsersGalleryPage() {
 
         {/* Gallery Grid */}
         {loading ? (
-          <div className="text-center text-white/70">Loading gallery…</div>
+          <div className="flex flex-col items-center justify-center py-24">
+            <Lottie
+              animationData={loader2}
+              // loop
+              style={{ width: "180px", height: "180px" }}
+            />
+            <p className="text-slate-500 mt-4">Loading images...</p>
+          </div>
         ) : filteredImages.length === 0 ? (
           <div className="text-center text-white/70">
             No images to display yet.
