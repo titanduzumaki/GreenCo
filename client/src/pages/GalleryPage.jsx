@@ -7,6 +7,9 @@ import { axiosInstance } from "../lib/axios";
 import loader2 from "../assets/loader2.json";
 import Lottie from "lottie-react";
 import TiltedCard from "@/components/TiltedCard";
+import RollingGallery from "@/components/RollingGallery";
+import { useMediaQuery } from "react-responsive";
+import Stack from "@/components/Stack";
 
 export function UsersGalleryPage() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -14,7 +17,9 @@ export function UsersGalleryPage() {
   const [loading, setLoading] = useState(false);
   const [galleryImages, setGalleryImages] = useState([]);
 
-  const categories = ["All"]; // Categories can be enhanced later from tags
+  const categories = ["All"];
+
+  const isMobile = useMediaQuery({ maxWidth: 768 });
 
   useEffect(() => {
     let mounted = true;
@@ -110,7 +115,6 @@ export function UsersGalleryPage() {
           <div className="flex flex-col items-center justify-center py-24">
             <Lottie
               animationData={loader2}
-              // loop
               style={{ width: "180px", height: "180px" }}
             />
             <p className="text-slate-500 mt-4">Loading images...</p>
@@ -120,53 +124,26 @@ export function UsersGalleryPage() {
             No images to display yet.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredImages.map((image, index) => (
-              <div
-                key={image.id}
-                className="group cursor-pointer"
-                onClick={() => openLightbox(index)}
-              >
-                <TiltedCard
-                  imageSrc={image.src}
-                  altText={image.title || "Project Image"}
-                  captionText={image.title || "View Project"}
-                  containerHeight="350px"
-                  containerWidth="100%"
-                  imageHeight="350px"
-                  imageWidth="100%"
-                  rotateAmplitude={10}
-                  scaleOnHover={1.1}
-                  showMobileWarning={false}
-                  showTooltip={false}
-                  displayOverlayContent={true}
-                  overlayContent={
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent rounded-2xl flex flex-col justify-end p-6">
-                      <div className="space-y-2">
-                        <h3 className="text-white font-semibold text-lg leading-tight">
-                          {image.title || "Project Showcase"}
-                        </h3>
-                        <p className="text-white/80 text-sm line-clamp-2">
-                          {image.description ||
-                            "Click to view full project details and explore our electrical infrastructure work."}
-                        </p>
-                        <div className="flex items-center justify-between mt-4">
-                          <Badge
-                            variant="secondary"
-                            className="bg-green-500/20 text-green-300 border-green-500/30"
-                          >
-                            {image.category}
-                          </Badge>
-                          <div className="text-white/60 text-xs">
-                            View Details →
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                />
-              </div>
-            ))}
+          <div className=" flex justify-center mt-1">
+            {isMobile ? (
+              <Stack
+                randomRotation={true}
+                sensitivity={180}
+                sendToBackOnClick={true}
+                cardDimensions={{ width: 300, height: 300 }}
+                cardsData={filteredImages.map((img, i) => ({
+                  id: i + 1,
+                  img: img.src,
+                }))}
+              />
+            ) : (
+              <RollingGallery
+                autoplay={true}
+                pauseOnHover={true}
+                images={filteredImages.map((img) => img.src)}
+                onImageClick={(index) => openLightbox(index)}
+              />
+            )}
           </div>
         )}
 

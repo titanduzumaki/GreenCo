@@ -12,6 +12,7 @@ import Lottie from "lottie-react";
 import loader3 from "../../assets/loader3.json";
 import picLoader from "../../assets/picLoader.json";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function GalleryPage() {
   const photos = usePhotoStore((state) => state.photos);
@@ -30,7 +31,8 @@ export default function GalleryPage() {
   const [selectedPhotos, setSelectedPhotos] = useState([]);
   const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);
   const [removingIds, setRemovingIds] = useState([]); // for fade-out animation
-  const showcaseLimit = 10;
+
+  const showcasedImageLength = photos.filter((p) => p.isShowcased);
 
   const navigate = useNavigate();
 
@@ -57,6 +59,19 @@ export default function GalleryPage() {
 
   const handleDelete = async (photo) => {
     try {
+      // If this photo is showcased, ensure we don't go below 6
+      if (photo.isShowcased) {
+        const showcasedIds = photos
+          .filter((p) => p.isShowcased)
+          .map((p) => p._id);
+        if (showcasedIds.length <= 6) {
+          toast.error(
+            `Cannot delete this photo. Minimum 6 showcased images required. Currently showcased: ${showcasedIds.length}`
+          );
+          return;
+        }
+      }
+
       setDeleting(true);
       setRemovingIds((prev) => [...prev, photo._id]);
       await deletePhotoById(photo._id);
@@ -72,6 +87,20 @@ export default function GalleryPage() {
 
   const handleBulkDelete = async () => {
     if (selectedPhotos.length === 0) return;
+
+    const showcasedIds = photos.filter((p) => p.isShowcased).map((p) => p._id);
+    const showcasedToDelete = selectedPhotos.filter((id) =>
+      showcasedIds.includes(id)
+    );
+
+    // Check min 6 limit
+    if (showcasedIds.length - showcasedToDelete.length < 6) {
+      toast.error(
+        `Cannot delete selected photos. At least 6 showcased images must remain. Currently showcased: ${showcasedIds.length}`
+      );
+      return;
+    }
+
     try {
       setDeleting(true);
       setRemovingIds([...selectedPhotos]);
@@ -88,8 +117,8 @@ export default function GalleryPage() {
   };
 
   const handleShowcaseSelection = async () => {
-    // Images currently showcased
     const showcasedIds = photos.filter((p) => p.isShowcased).map((p) => p._id);
+
     const toShowcase = selectedPhotos.filter(
       (id) => !showcasedIds.includes(id)
     );
@@ -97,13 +126,19 @@ export default function GalleryPage() {
       showcasedIds.includes(id)
     );
 
-    // Enforce limit on total showcased (optional client-side guard)
     const totalAfter =
       showcasedIds.length - toUnshowcase.length + toShowcase.length;
-    if (totalAfter > showcaseLimit) {
-      // Prefer not to import toast here; keep UI minimal
-      alert(
-        `You can showcase up to ${showcaseLimit} images. Currently showcased: ${showcasedIds.length}.`
+
+    if (totalAfter < 6) {
+      toast.error(
+        `You must have at least 6 images showcased. Current showcased: ${showcasedIds.length}`
+      );
+      return;
+    }
+
+    if (totalAfter > 10) {
+      toast.error(
+        `You can showcase a maximum of 10 images. Current showcased: ${showcasedIds.length}`
       );
       return;
     }
@@ -111,24 +146,11 @@ export default function GalleryPage() {
     try {
       await setShowcaseBulk(toShowcase, toUnshowcase);
       setSelectedPhotos([]);
-    } catch {
-      // handled in store
-    }
-  };
-
-  const handleClearShowcase = async () => {
-    const showcasedIds = photos.filter((p) => p.isShowcased).map((p) => p._id);
-    const toUnshowcase = selectedPhotos.filter((id) =>
-      showcasedIds.includes(id)
-    );
-    if (toUnshowcase.length === 0) return;
-    try {
-      await setShowcaseBulk([], toUnshowcase);
-      setSelectedPhotos((prev) =>
-        prev.filter((id) => !toUnshowcase.includes(id))
+      toast.success(
+        `Showcase updated successfully! Total showcased: ${totalAfter}`
       );
     } catch {
-      // handled in store
+      toast.error("Failed to update showcase.");
     }
   };
 
@@ -139,6 +161,10 @@ export default function GalleryPage() {
           <h1 className="text-4xl font-bold mb-6 text-slate-900 dark:text-white text-center tracking-tight">
             Media Gallery
           </h1>
+
+          <h2 className="text-lg text-slate-600 dark:text-slate-400">
+            Total Images Showcased : {showcasedImageLength.length}
+          </h2>
 
           <Button
             onClick={() => navigate("/admin/upload")}
@@ -174,15 +200,7 @@ export default function GalleryPage() {
               >
                 Showcase / Unshowcase
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="cursor-pointer"
-                disabled={selectedPhotos.length === 0 || loading}
-                onClick={handleClearShowcase}
-              >
-                Remove Showcase
-              </Button>
+
               <Button
                 variant="destructive"
                 size="sm"
