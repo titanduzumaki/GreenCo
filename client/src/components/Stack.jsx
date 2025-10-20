@@ -41,6 +41,7 @@ export default function Stack({
   cardsData = [],
   animationConfig = { stiffness: 260, damping: 20 },
   sendToBackOnClick = false,
+  onImageClick,
 }) {
   const [cards, setCards] = useState(
     cardsData.length
@@ -93,9 +94,38 @@ export default function Stack({
             onSendToBack={() => sendToBack(card.id)}
             sensitivity={sensitivity}
           >
-            <motion.div
+            {/* <motion.div
               className="rounded-2xl overflow-hidden border-4 border-grey"
               onClick={() => sendToBackOnClick && sendToBack(card.id)}
+              animate={{
+                rotateZ: (cards.length - index - 1) * 4 + randomRotate,
+                scale: 1 + index * 0.06 - cards.length * 0.06,
+                transformOrigin: "90% 90%",
+              }}
+              initial={false}
+              transition={{
+                type: "spring",
+                stiffness: animationConfig.stiffness,
+                damping: animationConfig.damping,
+              }}
+              style={{
+                width: cardDimensions.width,
+                height: cardDimensions.height,
+              }}
+            >
+              <img
+                src={card.img}
+                alt={`card-${card.id}`}
+                className="w-full h-full object-cover pointer-events-none"
+              />
+            </motion.div> */}
+
+            <motion.div
+              className="rounded-2xl overflow-hidden border-4 border-grey"
+              onClick={() => {
+                sendToBackOnClick && sendToBack(card.id);
+                onImageClick?.(card.originalIndex); // <-- trigger modal click here
+              }}
               animate={{
                 rotateZ: (cards.length - index - 1) * 4 + randomRotate,
                 scale: 1 + index * 0.06 - cards.length * 0.06,

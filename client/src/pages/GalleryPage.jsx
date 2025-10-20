@@ -129,11 +129,13 @@ export function UsersGalleryPage() {
               <Stack
                 randomRotation={true}
                 sensitivity={180}
-                sendToBackOnClick={true}
+                sendToBackOnClick={false}
+                onImageClick={(index) => openLightbox(index)} // <-- pass handler
                 cardDimensions={{ width: 300, height: 300 }}
                 cardsData={filteredImages.map((img, i) => ({
-                  id: i + 1,
+                  id: img._id || `card-${i}`,
                   img: img.src,
+                  originalIndex: i,
                 }))}
               />
             ) : (
