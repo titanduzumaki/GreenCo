@@ -1,274 +1,185 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Textarea } from '../../components/ui/textarea';
-import { Label } from '../../components/ui/label';
-import { Switch } from '../../components/ui/switch';
-import { 
-  Save, 
-  Globe, 
-  Share2, 
-  Search,
-  Palette
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { Separator } from '../../components/ui/separator';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Textarea } from "../../components/ui/textarea";
+import { Label } from "../../components/ui/label";
+import { Separator } from "../../components/ui/separator";
+import { MapPin, Trash2, Save } from "lucide-react";
+import { toast } from "sonner";
+import axios from "axios";
 
 export function SiteSettingsPage() {
-  const [settings, setSettings] = useState({
-    siteName: 'GreenCo',
-    tagline: 'Powering Cities, Empowering Lives',
-    homepageTitle: 'Electricity Infrastructure Solutions',
-    linkedin: 'https://linkedin.com/company/greenco',
-    instagram: 'https://instagram.com/greenco',
-    facebook: 'https://facebook.com/greenco',
-    twitter: 'https://twitter.com/greenco',
-    defaultTheme: 'light',
-    metaTitle: 'GreenCo - Leading Electricity Infrastructure Company',
-    metaDescription: 'GreenCo provides innovative electrical infrastructure solutions, from power grid modernization to renewable energy integration.',
-    metaKeywords: 'electricity, infrastructure, renewable energy, power grid, smart cities',
+  const [locations, setLocations] = useState([]);
+  const [newLocation, setNewLocation] = useState({
+    name: "",
+    latitude: "",
+    longitude: "",
+    description: "",
   });
-
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setIsSaving(false);
-      toast.success('Settings saved successfully');
-    }, 500);
+  // Fetch locations on mount
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const res = await axios.get("http://localhost:3001/api/locations");
+        setLocations(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load locations");
+      }
+    };
+    fetchLocations();
+  }, []);
+
+  // Handle input changes
+  const handleChange = (key, value) => {
+    setNewLocation((prev) => ({ ...prev, [key]: value }));
   };
 
-  const updateSetting = (key, value) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+  // Add new location
+  const addLocation = async () => {
+    const { name, latitude, longitude, description } = newLocation;
+    if (!name || !latitude || !longitude) {
+      toast.error("Please fill in name, latitude, and longitude");
+      return;
+    }
+
+    try {
+      const res = await axios.post("http://localhost:3001/api/locations", {
+        name,
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        description,
+      });
+      setLocations((prev) => [...prev, res.data]);
+      setNewLocation({ name: "", latitude: "", longitude: "", description: "" });
+      toast.success("Location added successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add location");
+    }
+  };
+
+  // Delete location
+  const deleteLocation = async (id) => {
+    if (!id) return;
+    try {
+      await axios.delete(`http://localhost:3001/api/locations/${id}`);
+      setLocations((prev) => prev.filter((loc) => loc._id !== id));
+      toast.success("Location deleted!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete location");
+    }
   };
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Header */}
       <div>
-        <h1 className="text-slate-900 dark:text-white mb-2">Site Settings</h1>
+        <h1 className="text-slate-900 dark:text-white mb-2">Manage Locations</h1>
         <p className="text-slate-600 dark:text-slate-400">
-          Configure your website settings and preferences
+          Add or view company locations on the map
         </p>
       </div>
 
-      {/* General Settings */}
+      {/* Add Location Form */}
       <Card className="border-slate-200 dark:border-slate-800">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
-            <Globe className="w-5 h-5 text-green-500" />
-            General
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="text-green-500" /> Add New Location
           </CardTitle>
-          <CardDescription className="text-slate-600 dark:text-slate-400">
-            Basic website information and branding
-          </CardDescription>
+          <CardDescription>Enter details for your company locations</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid gap-6 sm:grid-cols-2">
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label htmlFor="siteName">Site Name</Label>
+              <Label>Location Name</Label>
               <Input
-                id="siteName"
-                value={settings.siteName}
-                onChange={(e) => updateSetting('siteName', e.target.value)}
-                className="mt-2"
+                placeholder="e.g. Mumbai Substation"
+                value={newLocation.name}
+                onChange={(e) => handleChange("name", e.target.value)}
               />
             </div>
             <div>
-              <Label htmlFor="tagline">Tagline</Label>
+              <Label>Latitude</Label>
               <Input
-                id="tagline"
-                value={settings.tagline}
-                onChange={(e) => updateSetting('tagline', e.target.value)}
-                className="mt-2"
+                type="number"
+                step="any"
+                value={newLocation.latitude}
+                onChange={(e) => handleChange("latitude", e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>Longitude</Label>
+              <Input
+                type="number"
+                step="any"
+                value={newLocation.longitude}
+                onChange={(e) => handleChange("longitude", e.target.value)}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <Label>Description</Label>
+              <Textarea
+                placeholder="Optional details"
+                value={newLocation.description}
+                onChange={(e) => handleChange("description", e.target.value)}
               />
             </div>
           </div>
-          
-          <div>
-            <Label htmlFor="homepageTitle">Homepage Title</Label>
-            <Input
-              id="homepageTitle"
-              value={settings.homepageTitle}
-              onChange={(e) => updateSetting('homepageTitle', e.target.value)}
-              className="mt-2"
-            />
-            <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
-              This appears as the main heading on your homepage
-            </p>
-          </div>
+          <Button
+            onClick={addLocation}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            Add Location
+          </Button>
         </CardContent>
       </Card>
 
-      {/* Social Media Links */}
+      {/* Saved Locations */}
       <Card className="border-slate-200 dark:border-slate-800">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
-            <Share2 className="w-5 h-5 text-green-500" />
-            Social Media Links
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="text-green-500" /> Saved Locations
           </CardTitle>
-          <CardDescription className="text-slate-600 dark:text-slate-400">
-            Connect your social media profiles
-          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* LinkedIn */}
-          <div>
-            <Label htmlFor="linkedin" className="flex items-center gap-2">
-              LinkedIn
-            </Label>
-            <Input
-              id="linkedin"
-              value={settings.linkedin}
-              onChange={(e) => updateSetting('linkedin', e.target.value)}
-              className="mt-2"
-              placeholder="https://linkedin.com/company/yourcompany"
-            />
-          </div>
-          {/* Instagram */}
-          <div>
-            <Label htmlFor="instagram" className="flex items-center gap-2">
-              Instagram
-            </Label>
-            <Input
-              id="instagram"
-              value={settings.instagram}
-              onChange={(e) => updateSetting('instagram', e.target.value)}
-              className="mt-2"
-              placeholder="https://instagram.com/yourcompany"
-            />
-          </div>
-          {/* Facebook */}
-          <div>
-            <Label htmlFor="facebook" className="flex items-center gap-2">
-              Facebook
-            </Label>
-            <Input
-              id="facebook"
-              value={settings.facebook}
-              onChange={(e) => updateSetting('facebook', e.target.value)}
-              className="mt-2"
-              placeholder="https://facebook.com/yourcompany"
-            />
-          </div>
-          {/* Twitter */}
-          <div>
-            <Label htmlFor="twitter" className="flex items-center gap-2">
-              X (Twitter)
-            </Label>
-            <Input
-              id="twitter"
-              value={settings.twitter}
-              onChange={(e) => updateSetting('twitter', e.target.value)}
-              className="mt-2"
-              placeholder="https://twitter.com/yourcompany"
-            />
-          </div>
+        <CardContent className="space-y-2">
+          {locations.length > 0 ? (
+            locations.map((loc) => (
+              <div
+                key={loc._id || loc.name}
+                className="flex justify-between items-center bg-slate-100 dark:bg-slate-800 p-2 rounded-md"
+              >
+                <div>
+                  <p className="font-medium">{loc.name}</p>
+                  <p className="text-xs text-slate-500">
+                    ({loc.latitude}, {loc.longitude})
+                  </p>
+                  {loc.description && (
+                    <p className="text-xs text-slate-400">{loc.description}</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => deleteLocation(loc._id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-slate-500">No locations yet.</p>
+          )}
         </CardContent>
       </Card>
-
-      {/* Theme Preferences */}
-      <Card className="border-slate-200 dark:border-slate-800">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
-            <Palette className="w-5 h-5 text-green-500" />
-            Theme Preferences
-          </CardTitle>
-          <CardDescription className="text-slate-600 dark:text-slate-400">
-            Set the default appearance for your website
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-900">
-            <div>
-              <Label htmlFor="defaultTheme">Default Theme Mode</Label>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                Choose light or dark as the default theme
-              </p>
-            </div>
-            <Switch
-              id="defaultTheme"
-              checked={settings.defaultTheme === 'dark'}
-              onCheckedChange={(checked) => updateSetting('defaultTheme', checked ? 'dark' : 'light')}
-            />
-          </div>
-          <p className="text-sm text-slate-500 dark:text-slate-500 mt-2">
-            Current: <span className="font-medium">{settings.defaultTheme === 'dark' ? 'Dark' : 'Light'}</span> mode
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* SEO Settings */}
-      <Card className="border-slate-200 dark:border-slate-800">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
-            <Search className="w-5 h-5 text-green-500" />
-            SEO Settings
-          </CardTitle>
-          <CardDescription className="text-slate-600 dark:text-slate-400">
-            Optimize your website for search engines
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="metaTitle">Meta Title</Label>
-            <Input
-              id="metaTitle"
-              value={settings.metaTitle}
-              onChange={(e) => updateSetting('metaTitle', e.target.value)}
-              className="mt-2"
-              maxLength={60}
-            />
-            <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
-              {settings.metaTitle.length}/60 characters
-            </p>
-          </div>
-
-          <div>
-            <Label htmlFor="metaDescription">Meta Description</Label>
-            <Textarea
-              id="metaDescription"
-              value={settings.metaDescription}
-              onChange={(e) => updateSetting('metaDescription', e.target.value)}
-              className="mt-2"
-              rows={3}
-              maxLength={160}
-            />
-            <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
-              {settings.metaDescription.length}/160 characters
-            </p>
-          </div>
-
-          <div>
-            <Label htmlFor="metaKeywords">Keywords</Label>
-            <Textarea
-              id="metaKeywords"
-              value={settings.metaKeywords}
-              onChange={(e) => updateSetting('metaKeywords', e.target.value)}
-              className="mt-2"
-              rows={2}
-              placeholder="keyword1, keyword2, keyword3"
-            />
-            <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
-              Separate keywords with commas
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Save Button */}
-      <div className="sticky bottom-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 -mx-8 px-8 py-4 flex justify-end">
-        <Button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="bg-green-600 hover:bg-green-700 text-white gap-2 min-w-[150px]"
-        >
-          <Save className="w-4 h-4" />
-          {isSaving ? 'Saving...' : 'Save Changes'}
-        </Button>
-      </div>
     </div>
   );
 }

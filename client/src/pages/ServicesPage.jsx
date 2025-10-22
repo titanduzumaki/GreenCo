@@ -58,82 +58,85 @@ export function ServicesPage() {
   const services = [
     {
       icon: <Zap className="w-12 h-12 text-green-400" />,
-      title: "Power Grid Infrastructure",
+      title: "Electrical Consultant",
       description:
-        "Design and implementation of modern electrical grid systems for efficient energy distribution across urban and rural areas.",
+        "Expert consulting services providing innovative and compliant electrical designs focused on safety, efficiency, and sustainability for diverse projects.",
       features: [
-        "Smart Grid Technology",
-        "Load Balancing",
-        "Grid Modernization",
-        "Fault Detection Systems",
+        "System Design & Planning",
+        "Energy Efficiency Analysis",
+        "Power Distribution Strategy",
+        "Regulatory Compliance & Safety Audits",
       ],
-      category: "Infrastructure",
+      category: "Consultancy",
     },
+
     {
       icon: <Building className="w-12 h-12 text-blue-400" />,
-      title: "Smart City Solutions",
+      title: "Electrical Contractor",
       description:
-        "Comprehensive smart city infrastructure including intelligent lighting, traffic management, and IoT integration.",
+        "Professional electrical contracting services delivering turnkey solutions for commercial, industrial, and infrastructure projects — from system design to final commissioning.",
       features: [
-        "Smart Lighting",
-        "Traffic Control",
-        "IoT Integration",
-        "Energy Management",
+        "Project Design & Consultation",
+        "High & Low Voltage Installation",
+        "Industrial Wiring & Cabling",
+        "Testing, Commissioning & Certification",
       ],
-      category: "Smart Technology",
+      category: "Contracting",
     },
-    {
-      icon: <Leaf className="w-12 h-12 text-green-500" />,
-      title: "Renewable Integration",
-      description:
-        "Seamless integration of solar, wind, and other renewable energy sources into existing power infrastructure.",
-      features: [
-        "Solar Integration",
-        "Wind Power",
-        "Energy Storage",
-        "Grid Compatibility",
-      ],
-      category: "Renewable Energy",
-    },
+
+    // {
+    //   icon: <Leaf className="w-12 h-12 text-green-500" />,
+    //   title: "Renewable Integration",
+    //   description:
+    //     "Seamless integration of solar, wind, and other renewable energy sources into existing power infrastructure.",
+    //   features: [
+    //     "Solar Integration",
+    //     "Wind Power",
+    //     "Energy Storage",
+    //     "Grid Compatibility",
+    //   ],
+    //   category: "Renewable Energy",
+    // },
     {
       icon: <Wrench className="w-12 h-12 text-orange-400" />,
-      title: "Maintenance & Support",
+      title: "Electrical Installation",
       description:
-        "24/7 maintenance services ensuring optimal performance and longevity of electrical infrastructure systems.",
+        "Comprehensive electrical installation services for residential, commercial, and industrial projects, ensuring safety, compliance, and efficiency from design to implementation.",
       features: [
-        "Preventive Maintenance",
-        "Emergency Repairs",
-        "System Monitoring",
-        "Performance Optimization",
+        "New Wiring & Circuit Setup",
+        "Switchboard & Panel Installation",
+        "Lighting & Power Distribution",
+        "Load Testing & Safety Certification",
       ],
-      category: "Support",
+      category: "Installation",
     },
-    {
-      icon: <Globe className="w-12 h-12 text-purple-400" />,
-      title: "Network Management",
-      description:
-        "Advanced network management solutions for monitoring and controlling distributed electrical systems.",
-      features: [
-        "Real-time Monitoring",
-        "Remote Control",
-        "Data Analytics",
-        "Predictive Maintenance",
-      ],
-      category: "Management",
-    },
-    {
-      icon: <Battery className="w-12 h-12 text-yellow-400" />,
-      title: "Energy Storage",
-      description:
-        "Battery storage solutions and energy management systems for enhanced grid stability and efficiency.",
-      features: [
-        "Battery Systems",
-        "Energy Management",
-        "Grid Stability",
-        "Peak Shaving",
-      ],
-      category: "Storage",
-    },
+
+    // {
+    //   icon: <Globe className="w-12 h-12 text-purple-400" />,
+    //   title: "Network Management",
+    //   description:
+    //     "Advanced network management solutions for monitoring and controlling distributed electrical systems.",
+    //   features: [
+    //     "Real-time Monitoring",
+    //     "Remote Control",
+    //     "Data Analytics",
+    //     "Predictive Maintenance",
+    //   ],
+    //   category: "Management",
+    // },
+    // {
+    //   icon: <Battery className="w-12 h-12 text-yellow-400" />,
+    //   title: "Energy Storage",
+    //   description:
+    //     "Battery storage solutions and energy management systems for enhanced grid stability and efficiency.",
+    //   features: [
+    //     "Battery Systems",
+    //     "Energy Management",
+    //     "Grid Stability",
+    //     "Peak Shaving",
+    //   ],
+    //   category: "Storage",
+    // },
   ];
 
   return (

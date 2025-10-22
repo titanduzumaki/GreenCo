@@ -3,18 +3,12 @@ import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { toast } from "sonner";
 import { useContactStore } from "../store/contactStore";
 import Lottie from "lottie-react";
 import loader2 from "../assets/loader2.json";
 import {
-  fadeInUp,
   fadeInLeft,
   fadeInRight,
   scaleIn,
@@ -22,6 +16,37 @@ import {
   cardHover,
   cleanupAnimations,
 } from "../lib/gsapAnimations";
+import axios from "axios";
+
+// Leaflet imports
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+// Fix default leaflet marker icons
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
+
+// Component to fit map bounds to markers
+function FitBounds({ locations }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (locations.length > 0) {
+      const bounds = locations.map((loc) => [parseFloat(loc.latitude), parseFloat(loc.longitude)]);
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }, [locations, map]);
+
+  return null;
+}
 
 export function ContactPage() {
   const [formData, setFormData] = useState({
@@ -32,40 +57,39 @@ export function ContactPage() {
     message: "",
   });
 
+  const [locations, setLocations] = useState([]);
   const { sendContactMessage, loading } = useContactStore();
 
   const headerRef = useRef(null);
   const contactInfoRef = useRef(null);
   const formRef = useRef(null);
-  const mapRef = useRef(null);
 
+  // Fetch locations
   useEffect(() => {
-    // Header animation
-    if (headerRef.current) {
-      textReveal(headerRef.current.querySelectorAll("h1, p"));
-    }
+    const fetchLocations = async () => {
+      try {
+        const res = await axios.get("http://localhost:3001/api/locations");
+        setLocations(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.error("Error fetching locations:", err);
+        toast.error("Failed to load map locations");
+        setLocations([]);
+      }
+    };
+    fetchLocations();
+  }, []);
 
-    // Contact info section
+  // Animations
+  useEffect(() => {
+    if (headerRef.current) textReveal(headerRef.current.querySelectorAll("h1, p"));
     if (contactInfoRef.current) {
       const infoCards = contactInfoRef.current.querySelectorAll(".info-card");
       fadeInLeft(infoCards, { stagger: 0.2 });
       cardHover(infoCards);
     }
+    if (formRef.current) fadeInRight([formRef.current]);
 
-    // Form section
-    if (formRef.current) {
-      fadeInRight([formRef.current]);
-    }
-
-    // Map section
-    if (mapRef.current) {
-      scaleIn([mapRef.current]);
-    }
-
-    // Cleanup on unmount
-    return () => {
-      cleanupAnimations();
-    };
+    return () => cleanupAnimations();
   }, []);
 
   const handleInputChange = (e) => {
@@ -75,19 +99,10 @@ export function ContactPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const res = await sendContactMessage(formData);
-
       toast.success(res.message);
-
-      setFormData({
-        name: "",
-        email: "",
-        company: "",
-        subject: "",
-        message: "",
-      });
+      setFormData({ name: "", email: "", company: "", subject: "", message: "" });
     } catch (error) {
       toast.error(error.message);
     }
@@ -116,16 +131,12 @@ export function ContactPage() {
       {loading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/50">
           <div className="w-40 h-40">
-            <Lottie animationData={loader2} loop={true} />
+            <Lottie animationData={loader2} loop />
           </div>
         </div>
       )}
 
-      <div
-        className={`container mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
-          loading ? "blur-sm pointer-events-none select-none" : ""
-        }`}
-      >
+      <div className={`container mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ${loading ? "blur-sm pointer-events-none select-none" : ""}`}>
         {/* Header */}
         <div ref={headerRef} className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6">
@@ -135,9 +146,7 @@ export function ContactPage() {
             </span>
           </h1>
           <p className="text-xl text-white/70 max-w-3xl mx-auto">
-            Ready to power your next project? Get in touch with our team of
-            experts to discuss your electrical infrastructure needs and discover
-            how we can help.
+            Ready to power your next project? Get in touch with our team of experts to discuss your electrical infrastructure needs and discover how we can help.
           </p>
         </div>
 
@@ -153,13 +162,9 @@ export function ContactPage() {
                   <div key={index} className="flex items-start space-x-4">
                     <div className="flex-shrink-0 mt-1">{info.icon}</div>
                     <div>
-                      <h3 className="text-white font-semibold mb-1">
-                        {info.title}
-                      </h3>
-                      {info.details.map((detail, detailIndex) => (
-                        <p key={detailIndex} className="text-white/70">
-                          {detail}
-                        </p>
+                      <h3 className="text-white font-semibold mb-1">{info.title}</h3>
+                      {info.details.map((detail, i) => (
+                        <p key={i} className="text-white/70">{detail}</p>
                       ))}
                     </div>
                   </div>
@@ -187,9 +192,7 @@ export function ContactPage() {
                     <span>Emergency Only</span>
                   </div>
                   <div className="mt-4 pt-4 border-t border-white/10">
-                    <p className="text-green-400 font-semibold">
-                      24/7 Emergency Support Available
-                    </p>
+                    <p className="text-green-400 font-semibold">24/7 Emergency Support Available</p>
                   </div>
                 </div>
               </CardContent>
@@ -205,101 +208,25 @@ export function ContactPage() {
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="name" className="block text-white mb-2">
-                        Full Name *
-                      </label>
-                      <Input
-                        id="name"
-                        name="name"
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                        placeholder="Your full name"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-white mb-2">
-                        Email Address *
-                      </label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                        placeholder="your.email@example.com"
-                      />
-                    </div>
+                    <InputGroup label="Full Name *" id="name" name="name" value={formData.name} onChange={handleInputChange} required />
+                    <InputGroup label="Email Address *" id="email" name="email" value={formData.email} onChange={handleInputChange} type="email" required />
                   </div>
-
                   <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label
-                        htmlFor="company"
-                        className="block text-white mb-2"
-                      >
-                        Company
-                      </label>
-                      <Input
-                        id="company"
-                        name="company"
-                        type="text"
-                        value={formData.company}
-                        onChange={handleInputChange}
-                        className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                        placeholder="Your company name"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="subject"
-                        className="block text-white mb-2"
-                      >
-                        Subject *
-                      </label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        type="text"
-                        required
-                        value={formData.subject}
-                        onChange={handleInputChange}
-                        className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                        placeholder="How can we help?"
-                      />
-                    </div>
+                    <InputGroup label="Company" id="company" name="company" value={formData.company} onChange={handleInputChange} />
+                    <InputGroup label="Subject *" id="subject" name="subject" value={formData.subject} onChange={handleInputChange} required />
                   </div>
-
-                  <div>
-                    <label htmlFor="message" className="block text-white mb-2">
-                      Message *
-                    </label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      required
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      rows={6}
-                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                      placeholder="Tell us about your project requirements..."
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full cursor-pointer bg-green-500 hover:bg-green-600 text-white"
-                    size="lg"
-                  >
-                    <>
-                      <Send className="w-5 h-5 mr-2" /> Send Message
-                    </>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    rows={6}
+                    required
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    placeholder="Tell us about your project requirements..."
+                  />
+                  <Button type="submit" disabled={loading} className="w-full bg-green-500 hover:bg-green-600 text-white" size="lg">
+                    <Send className="w-5 h-5 mr-2" /> Send Message
                   </Button>
                 </form>
               </CardContent>
@@ -308,25 +235,61 @@ export function ContactPage() {
         </div>
 
         {/* Map Section */}
-        <div ref={mapRef} className="mt-16">
+        <div className="mt-16">
           <Card className="bg-white/5 border-white/10">
             <CardHeader>
               <CardTitle className="text-white">Find Our Office</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-white/10 rounded-lg flex items-center justify-center">
-                <div className="text-center text-white/70">
-                  <MapPin className="w-12 h-12 mx-auto mb-4 text-green-400" />
-                  <p>Interactive map would be displayed here</p>
-                  <p className="text-sm mt-2">
-                    123 Energy Boulevard, Tech City, TC 12345
-                  </p>
-                </div>
+              <div className="h-[500px] w-full rounded-lg overflow-hidden">
+                <MapContainer center={[19.076, 72.8777]} zoom={5.5} style={{ height: "100%", width: "100%" }}>
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+
+                  {locations.length > 0 ? (
+                    locations.map((loc, idx) => (
+                      <Marker key={idx} position={[parseFloat(loc.latitude), parseFloat(loc.longitude)]}>
+                        <Popup>
+                          <strong>{loc.name}</strong>
+                          <br />
+                          {loc.description || "No description available"}
+                        </Popup>
+                      </Marker>
+                    ))
+                  ) : (
+                    <Marker position={[19.076, 72.8777]}>
+                      <Popup>Default Location (Mumbai)</Popup>
+                    </Marker>
+                  )}
+
+                  {/* Fit map bounds */}
+                  <FitBounds locations={locations} />
+                </MapContainer>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Helper component for consistent Input + Label
+function InputGroup({ label, id, name, value, onChange, type = "text", required = false }) {
+  return (
+    <div>
+      <label htmlFor={id} className="block text-white mb-2">{label}</label>
+      <Input
+        id={id}
+        name={name}
+        type={type}
+        value={value}
+        onChange={onChange}
+        required={required}
+        className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+      />
     </div>
   );
 }

@@ -6,9 +6,12 @@ import authRoute from "./routes/auth.route.js";
 import messageRoute from "./routes/message.route.js";
 import imageRoute from "./routes/images.route.js";
 import cors from "cors";
+import locationRoutes from "./routes/location.route.js";
 
 const PORT = ENV.PORT || 4001;
 const app = express();
+
+
 
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 app.use(express.json());
@@ -17,6 +20,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoute);
 app.use("/api/msg", messageRoute);
 app.use("/api/images", imageRoute);
+app.use("/api/locations", locationRoutes);
 
 app.get("/test", (req, res) => {
   res.send("server is working fine");

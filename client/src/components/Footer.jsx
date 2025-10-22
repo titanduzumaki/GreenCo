@@ -11,13 +11,10 @@ export function Footer() {
   ];
 
   const services = [
-    'Power Grid Infrastructure',
-    'Smart City Solutions',
-    'Renewable Integration',
-    'Network Management',
-    'Energy Storage',
-    'Maintenance & Support'
-  ];
+    'Electrical Consultant',
+    'Electrical Contractor',
+    'Electrical Installation'
+    ];
 
   const socialLinks = [
     { icon: <Facebook size={20} />, href: '#', label: 'Facebook' },

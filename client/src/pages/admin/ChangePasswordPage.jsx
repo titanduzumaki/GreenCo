@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -37,6 +38,7 @@ const PasswordInput = ({ label, value, onChange, error, showToggle = true, id })
 };
 
 export function ChangePasswordPage() {
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -62,6 +64,7 @@ export function ChangePasswordPage() {
   };
 
   const passwordStrength = getPasswordStrength(formData.newPassword);
+
   const passwordRequirements = [
     { text: 'At least 8 characters', met: formData.newPassword.length >= 8 },
     { text: 'Contains uppercase and lowercase', met: /[a-z]/.test(formData.newPassword) && /[A-Z]/.test(formData.newPassword) },
@@ -84,26 +87,50 @@ export function ChangePasswordPage() {
     return !Object.values(newErrors).some(error => error !== '');
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast.success('Password updated successfully');
-      setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      setErrors({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    }, 1000);
-  };
-
   const updateField = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' }));
   };
 
-  const getStrengthColor = () => passwordStrength <= 2 ? 'bg-red-500' : passwordStrength <= 3 ? 'bg-orange-500' : 'bg-green-500';
-  const getStrengthText = () => passwordStrength <= 2 ? 'Weak' : passwordStrength <= 3 ? 'Medium' : 'Strong';
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch(`http://localhost:3001/api/auth/change-password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Send cookie
+        body: JSON.stringify({
+          currentPassword: formData.currentPassword,
+          newPassword: formData.newPassword
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || 'Failed to change password');
+
+      toast.success(data.message);
+
+      // Clear form
+      setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+
+      // Redirect to login after password change
+      navigate('/login');
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getStrengthColor = () =>
+    passwordStrength <= 2 ? 'bg-red-500' : passwordStrength <= 3 ? 'bg-orange-500' : 'bg-green-500';
+  const getStrengthText = () =>
+    passwordStrength <= 2 ? 'Weak' : passwordStrength <= 3 ? 'Medium' : 'Strong';
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -150,14 +177,6 @@ export function ChangePasswordPage() {
                 <div className="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div className={`h-full transition-all duration-300 ${getStrengthColor()}`} style={{ width: `${(passwordStrength / 5) * 100}%` }} />
                 </div>
-                <div className="mt-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-900 space-y-2">
-                  {passwordRequirements.map((req, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm">
-                      {req.met ? <Check className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" /> : <X className="w-4 h-4 text-slate-400 flex-shrink-0" />}
-                      <span className={req.met ? 'text-green-600 dark:text-green-400' : 'text-slate-600 dark:text-slate-400'}>{req.text}</span>
-                    </div>
-                  ))}
-                </div>
               </div>
             )}
 
@@ -168,19 +187,6 @@ export function ChangePasswordPage() {
               onChange={(v) => updateField('confirmPassword', v)}
               error={errors.confirmPassword}
             />
-
-            {!errors.confirmPassword && formData.confirmPassword && formData.newPassword === formData.confirmPassword && (
-              <div className="flex items-center gap-2 mt-2">
-                <Check className="w-4 h-4 text-green-600" />
-                <p className="text-green-600 text-sm">Passwords match</p>
-              </div>
-            )}
-
-            <Alert className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900">
-              <AlertDescription className="text-slate-700 dark:text-slate-300 text-sm">
-                <strong>Security tip:</strong> Use a unique password that you don't use for other accounts. Consider using a password manager to generate and store strong passwords.
-              </AlertDescription>
-            </Alert>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
               <Button type="button" variant="outline" onClick={() => setFormData({ currentPassword: '', newPassword: '', confirmPassword: '' })}>
