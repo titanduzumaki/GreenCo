@@ -15,12 +15,21 @@ import {
   pageEntrance,
   cleanupAnimations,
 } from "../lib/gsapAnimations";
+import { usePhotoStore } from "@/store/PhotoStore";
 
 export function HomePage() {
   const heroRef = useRef(null);
   const servicesRef = useRef(null);
   const featuresRef = useRef(null);
   const galleryRef = useRef(null);
+
+  const recPhotos = usePhotoStore((state) => state.recPhotos);
+  const fetchRecentImages = usePhotoStore((state) => state.fetchRecentImages);
+  const recentPhotos = recPhotos;
+
+  useEffect(() => {
+    fetchRecentImages();
+  }, [fetchRecentImages]);
 
   useEffect(() => {
     // Page entrance animation
@@ -209,18 +218,24 @@ export function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {Array.from({ length: 4 }).map((_, index) => (
+            {recentPhotos.map((photo) => (
               <div
-                key={index}
+                key={photo._id}
                 className="gallery-image aspect-square overflow-hidden rounded-lg"
               >
-                <ImageWithFallback
-                  src={`https://images.unsplash.com/photo-${
-                    1580000000000 + index * 100000
-                  }?w=300&h=300&fit=crop&auto=format`}
-                  alt={`Project ${index + 1}`}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                <img
+                  src={photo.url}
+                  alt={photo.title || "Image"}
+                  className="w-full h-full cursor-pointer  object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+
+                <div className="absolute top-2 right-2">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      photo.isVisible ? "bg-green-500" : "bg-slate-400"
+                    }`}
+                  />
+                </div>
               </div>
             ))}
           </div>

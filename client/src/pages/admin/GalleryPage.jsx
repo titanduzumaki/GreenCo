@@ -59,7 +59,6 @@ export default function GalleryPage() {
 
   const handleDelete = async (photo) => {
     try {
-      // If this photo is showcased, ensure we don't go below 6
       if (photo.isShowcased) {
         const showcasedIds = photos
           .filter((p) => p.isShowcased)
