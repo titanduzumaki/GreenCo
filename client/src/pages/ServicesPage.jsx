@@ -24,11 +24,14 @@ import {
   cardHover,
   cleanupAnimations,
 } from "../lib/gsapAnimations";
+import { useNavigate } from "react-router-dom";
 
 export function ServicesPage() {
   const headerRef = useRef(null);
   const servicesRef = useRef(null);
   const ctaRef = useRef(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Header animation
@@ -84,19 +87,6 @@ export function ServicesPage() {
       category: "Contracting",
     },
 
-    // {
-    //   icon: <Leaf className="w-12 h-12 text-green-500" />,
-    //   title: "Renewable Integration",
-    //   description:
-    //     "Seamless integration of solar, wind, and other renewable energy sources into existing power infrastructure.",
-    //   features: [
-    //     "Solar Integration",
-    //     "Wind Power",
-    //     "Energy Storage",
-    //     "Grid Compatibility",
-    //   ],
-    //   category: "Renewable Energy",
-    // },
     {
       icon: <Wrench className="w-12 h-12 text-orange-400" />,
       title: "Electrical Installation",
@@ -110,33 +100,6 @@ export function ServicesPage() {
       ],
       category: "Installation",
     },
-
-    // {
-    //   icon: <Globe className="w-12 h-12 text-purple-400" />,
-    //   title: "Network Management",
-    //   description:
-    //     "Advanced network management solutions for monitoring and controlling distributed electrical systems.",
-    //   features: [
-    //     "Real-time Monitoring",
-    //     "Remote Control",
-    //     "Data Analytics",
-    //     "Predictive Maintenance",
-    //   ],
-    //   category: "Management",
-    // },
-    // {
-    //   icon: <Battery className="w-12 h-12 text-yellow-400" />,
-    //   title: "Energy Storage",
-    //   description:
-    //     "Battery storage solutions and energy management systems for enhanced grid stability and efficiency.",
-    //   features: [
-    //     "Battery Systems",
-    //     "Energy Management",
-    //     "Grid Stability",
-    //     "Peak Shaving",
-    //   ],
-    //   category: "Storage",
-    // },
   ];
 
   return (
@@ -216,7 +179,12 @@ export function ServicesPage() {
             to life.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+            <button
+              onClick={() => {
+                navigate("/contact");
+              }}
+              className="bg-green-500 cursor-pointer hover:bg-green-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+            >
               Request Consultation
             </button>
             <button className="border border-white/20 text-white hover:bg-white/10 px-8 py-3 rounded-lg font-semibold transition-colors">
