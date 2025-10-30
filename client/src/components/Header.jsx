@@ -52,14 +52,14 @@ export function Header() {
 
           {/* Theme Toggle & Mobile Menu Button */}
           <div className="flex items-center space-x-4">
-            <Button
+            {/* <Button
               variant="ghost"
               size="sm"
               onClick={toggleTheme}
               className="text-white hover:text-green-400 cursor-pointer hover:bg-white/10"
             >
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-            </Button>
+            </Button> */}
 
             {/* Mobile Menu Button */}
             <Button
