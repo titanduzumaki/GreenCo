@@ -26,12 +26,16 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "./ui/avatar";
+import { useAuthStore } from "@/store/authStore";
 
 export default function AdminLayout() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const { logout, authUser } = useAuthStore();
+  console.log("AuthUsererr:", authUser);
 
   const navItems = [
     { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -46,7 +50,10 @@ export default function AdminLayout() {
   const isActive = (path) =>
     location.pathname === path || location.pathname.startsWith(path + "/");
 
-  const handleLogout = () => navigate("/");
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
 
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white">
@@ -121,7 +128,7 @@ export default function AdminLayout() {
           </Button>
 
           <div className="flex items-center gap-3 ml-auto">
-            <Button
+            {/* <Button
               variant="ghost"
               size="sm"
               onClick={toggleTheme}
@@ -132,13 +139,13 @@ export default function AdminLayout() {
               ) : (
                 <Moon className="w-5 h-5" />
               )}
-            </Button>
+            </Button> */}
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-10 w-10 rounded-full"
+                  className="relative cursor-pointer h-10 w-10 rounded-full"
                 >
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300">
@@ -150,9 +157,9 @@ export default function AdminLayout() {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div>
-                    <p className="text-sm font-medium">Admin User</p>
+                    <p className="text-sm font-medium">{authUser.role}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      admin@greenco.com
+                      {authUser.email}
                     </p>
                   </div>
                 </DropdownMenuLabel>
