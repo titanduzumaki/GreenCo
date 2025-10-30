@@ -3,7 +3,12 @@ import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { toast } from "sonner";
 import { useContactStore } from "../store/contactStore";
 import Lottie from "lottie-react";
@@ -40,7 +45,10 @@ function FitBounds({ locations }) {
 
   useEffect(() => {
     if (locations.length > 0) {
-      const bounds = locations.map((loc) => [parseFloat(loc.latitude), parseFloat(loc.longitude)]);
+      const bounds = locations.map((loc) => [
+        parseFloat(loc.latitude),
+        parseFloat(loc.longitude),
+      ]);
       map.fitBounds(bounds, { padding: [50, 50] });
     }
   }, [locations, map]);
@@ -81,7 +89,8 @@ export function ContactPage() {
 
   // Animations
   useEffect(() => {
-    if (headerRef.current) textReveal(headerRef.current.querySelectorAll("h1, p"));
+    if (headerRef.current)
+      textReveal(headerRef.current.querySelectorAll("h1, p"));
     if (contactInfoRef.current) {
       const infoCards = contactInfoRef.current.querySelectorAll(".info-card");
       fadeInLeft(infoCards, { stagger: 0.2 });
@@ -102,7 +111,13 @@ export function ContactPage() {
     try {
       const res = await sendContactMessage(formData);
       toast.success(res.message);
-      setFormData({ name: "", email: "", company: "", subject: "", message: "" });
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        subject: "",
+        message: "",
+      });
     } catch (error) {
       toast.error(error.message);
     }
@@ -136,7 +151,11 @@ export function ContactPage() {
         </div>
       )}
 
-      <div className={`container mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ${loading ? "blur-sm pointer-events-none select-none" : ""}`}>
+      <div
+        className={`container mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
+          loading ? "blur-sm pointer-events-none select-none" : ""
+        }`}
+      >
         {/* Header */}
         <div ref={headerRef} className="text-center mb-16">
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6">
@@ -146,7 +165,9 @@ export function ContactPage() {
             </span>
           </h1>
           <p className="text-xl text-white/70 max-w-3xl mx-auto">
-            Ready to power your next project? Get in touch with our team of experts to discuss your electrical infrastructure needs and discover how we can help.
+            Ready to power your next project? Get in touch with our team of
+            experts to discuss your electrical infrastructure needs and discover
+            how we can help.
           </p>
         </div>
 
@@ -162,9 +183,13 @@ export function ContactPage() {
                   <div key={index} className="flex items-start space-x-4">
                     <div className="flex-shrink-0 mt-1">{info.icon}</div>
                     <div>
-                      <h3 className="text-white font-semibold mb-1">{info.title}</h3>
+                      <h3 className="text-white font-semibold mb-1">
+                        {info.title}
+                      </h3>
                       {info.details.map((detail, i) => (
-                        <p key={i} className="text-white/70">{detail}</p>
+                        <p key={i} className="text-white/70">
+                          {detail}
+                        </p>
                       ))}
                     </div>
                   </div>
@@ -192,7 +217,9 @@ export function ContactPage() {
                     <span>Emergency Only</span>
                   </div>
                   <div className="mt-4 pt-4 border-t border-white/10">
-                    <p className="text-green-400 font-semibold">24/7 Emergency Support Available</p>
+                    <p className="text-green-400 font-semibold">
+                      24/7 Emergency Support Available
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -208,12 +235,40 @@ export function ContactPage() {
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
-                    <InputGroup label="Full Name *" id="name" name="name" value={formData.name} onChange={handleInputChange} required />
-                    <InputGroup label="Email Address *" id="email" name="email" value={formData.email} onChange={handleInputChange} type="email" required />
+                    <InputGroup
+                      label="Full Name *"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                    />
+                    <InputGroup
+                      label="Email Address *"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      type="email"
+                      required
+                    />
                   </div>
                   <div className="grid md:grid-cols-2 gap-6">
-                    <InputGroup label="Company" id="company" name="company" value={formData.company} onChange={handleInputChange} />
-                    <InputGroup label="Subject *" id="subject" name="subject" value={formData.subject} onChange={handleInputChange} required />
+                    <InputGroup
+                      label="Company"
+                      id="company"
+                      name="company"
+                      value={formData.company}
+                      onChange={handleInputChange}
+                    />
+                    <InputGroup
+                      label="Subject *"
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      required
+                    />
                   </div>
                   <Textarea
                     id="message"
@@ -225,7 +280,12 @@ export function ContactPage() {
                     className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                     placeholder="Tell us about your project requirements..."
                   />
-                  <Button type="submit" disabled={loading} className="w-full bg-green-500 hover:bg-green-600 text-white" size="lg">
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-green-500 hover:bg-green-600 text-white"
+                    size="lg"
+                  >
                     <Send className="w-5 h-5 mr-2" /> Send Message
                   </Button>
                 </form>
@@ -242,7 +302,11 @@ export function ContactPage() {
             </CardHeader>
             <CardContent>
               <div className="h-[500px] w-full rounded-lg overflow-hidden">
-                <MapContainer center={[19.076, 72.8777]} zoom={5.5} style={{ height: "100%", width: "100%" }}>
+                <MapContainer
+                  center={[19.076, 72.8777]}
+                  zoom={5.5}
+                  style={{ height: "100%", width: "100%" }}
+                >
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -250,7 +314,13 @@ export function ContactPage() {
 
                   {locations.length > 0 ? (
                     locations.map((loc, idx) => (
-                      <Marker key={idx} position={[parseFloat(loc.latitude), parseFloat(loc.longitude)]}>
+                      <Marker
+                        key={idx}
+                        position={[
+                          parseFloat(loc.latitude),
+                          parseFloat(loc.longitude),
+                        ]}
+                      >
                         <Popup>
                           <strong>{loc.name}</strong>
                           <br />
@@ -277,10 +347,20 @@ export function ContactPage() {
 }
 
 // Helper component for consistent Input + Label
-function InputGroup({ label, id, name, value, onChange, type = "text", required = false }) {
+function InputGroup({
+  label,
+  id,
+  name,
+  value,
+  onChange,
+  type = "text",
+  required = false,
+}) {
   return (
     <div>
-      <label htmlFor={id} className="block text-white mb-2">{label}</label>
+      <label htmlFor={id} className="block text-white mb-2">
+        {label}
+      </label>
       <Input
         id={id}
         name={name}

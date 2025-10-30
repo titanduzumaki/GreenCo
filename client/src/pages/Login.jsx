@@ -1,55 +1,22 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../components/ThemeProvider";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuthStore } from "@/store/authStore";
 
 const Login = () => {
   const { theme } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { setUser } = useAuth();
+  // const { setUser } = useAuth();
   const navigate = useNavigate();
+
+  const { login, isLoggingIn } = useAuthStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      // 1️⃣ Login request (cookie will be set)
-      const res = await fetch("http://localhost:3001/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // important for sending/receiving cookie
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-      console.log("Login response:", data, "Status:", res.status);
-
-      if (!res.ok) {
-        alert(data.message || "Login failed");
-        return;
-      }
-
-      // 2️⃣ Fetch user data (JWT read automatically from cookie)
-      const userRes = await fetch("http://localhost:3001/api/auth/me", {
-        credentials: "include",
-      });
-
-      const userData = await userRes.json();
-      console.log("User data response:", userData, "Status:", userRes.status);
-
-      if (userRes.ok) {
-        setUser(userData);
-        alert("Login successful!");
-        navigate("/admin");
-      } else {
-        alert(userData.message || "Failed to fetch user data");
-      }
-    } catch (err) {
-      console.error("Error logging in:", err);
-      alert("Something went wrong. Check console.");
-    }
+    await login({ email, password });
+    navigate("/admin");
   };
 
   return (
@@ -69,7 +36,9 @@ const Login = () => {
                   <path d="M5 21a8 8 0 0 1 8-8h2a4 4 0 0 0 4-4V5a2 2 0 0 0-2-2h-4C6.477 3 3 6.477 3 11v6a2 2 0 0 0 2 2Z" />
                 </svg>
               </span>
-              <span className="text-lg font-semibold tracking-wide">GreenCo</span>
+              <span className="text-lg font-semibold tracking-wide">
+                GreenCo
+              </span>
             </div>
             <h1 className="text-3xl lg:text-4xl font-bold leading-none mb-3">
               Welcome back
@@ -88,7 +57,9 @@ const Login = () => {
           <h2 className="text-xl font-semibold mb-6">Sign in</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block mb-2">Email</label>
+              <label htmlFor="email" className="block mb-2">
+                Email
+              </label>
               <input
                 id="email"
                 type="email"
@@ -101,7 +72,9 @@ const Login = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block mb-2">Password</label>
+              <label htmlFor="password" className="block mb-2">
+                Password
+              </label>
               <div className="relative">
                 <input
                   id="password"
@@ -124,9 +97,10 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full py-3 cursor-pointer rounded-lg bg-green-500 text-white font-medium hover:bg-green-600 transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+              disabled={isLoggingIn}
+              className="w-full py-3 cursor-pointer bg-green-500 text-white rounded-lg hover:bg-green-600"
             >
-              Sign in
+              {isLoggingIn ? "Signing in..." : "Sign in"}
             </button>
           </form>
         </div>

@@ -194,7 +194,7 @@ export default function GalleryPage() {
               <Button
                 variant="secondary"
                 size="sm"
-                className="cursor-pointer"
+                className="cursor-pointer bg-green-700"
                 disabled={selectedPhotos.length === 0 || loading}
                 onClick={handleShowcaseSelection}
               >
@@ -202,9 +202,9 @@ export default function GalleryPage() {
               </Button>
 
               <Button
-                variant="destructive"
+                variant="secondary"
                 size="sm"
-                className="cursor-pointer"
+                className="cursor-pointer bg-red-700"
                 disabled={selectedPhotos.length === 0 || deleting}
                 onClick={() => setBulkDeleteDialog(true)}
               >
