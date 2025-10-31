@@ -16,7 +16,6 @@ import axios from "axios";
 
 const SOCIAL_PLATFORMS = ["Facebook", "Twitter", "Instagram", "LinkedIn"];
 
-
 export function SiteSettingsPage() {
   const [locations, setLocations] = useState([]);
   const [newLocation, setNewLocation] = useState({
@@ -38,7 +37,9 @@ export function SiteSettingsPage() {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/api/locations");
+        const res = await axios.get(
+          "https://greenco-jmk5.onrender.com/api/locations"
+        );
         setLocations(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error(err);
@@ -52,7 +53,9 @@ export function SiteSettingsPage() {
   useEffect(() => {
     const fetchContact = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/api/site-settings");
+        const res = await axios.get(
+          "https://greenco-jmk5.onrender.com/api/site-settings"
+        );
         if (res.data) {
           setContact({
             phoneNumbers: res.data.phoneNumbers.length
@@ -83,14 +86,22 @@ export function SiteSettingsPage() {
       return;
     }
     try {
-      const res = await axios.post("http://localhost:3001/api/locations", {
-        name,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
-        description,
-      });
+      const res = await axios.post(
+        "https://greenco-jmk5.onrender.com/api/locations",
+        {
+          name,
+          latitude: parseFloat(latitude),
+          longitude: parseFloat(longitude),
+          description,
+        }
+      );
       setLocations((prev) => [...prev, res.data]);
-      setNewLocation({ name: "", latitude: "", longitude: "", description: "" });
+      setNewLocation({
+        name: "",
+        latitude: "",
+        longitude: "",
+        description: "",
+      });
       toast.success("Location added successfully!");
     } catch (err) {
       console.error(err);
@@ -101,7 +112,9 @@ export function SiteSettingsPage() {
   const deleteLocation = async (id) => {
     if (!id) return;
     try {
-      await axios.delete(`http://localhost:3001/api/locations/${id}`);
+      await axios.delete(
+        `https://greenco-jmk5.onrender.com/api/locations/${id}`
+      );
       setLocations((prev) => prev.filter((loc) => loc._id !== id));
       toast.success("Location deleted!");
     } catch (err) {
@@ -152,7 +165,10 @@ export function SiteSettingsPage() {
   const saveContact = async () => {
     try {
       setIsContactSaving(true);
-      await axios.post("http://localhost:3001/api/site-settings", contact);
+      await axios.post(
+        "https://greenco-jmk5.onrender.com/api/site-settings",
+        contact
+      );
       toast.success("Contact info saved successfully!");
     } catch (err) {
       console.error(err);
@@ -235,23 +251,32 @@ export function SiteSettingsPage() {
                 {/* Dropdown for Platform */}
                 <select
                   value={social.platform}
-                  onChange={(e) => handleSocialChange(idx, "platform", e.target.value)}
+                  onChange={(e) =>
+                    handleSocialChange(idx, "platform", e.target.value)
+                  }
                   className="bg-white/5 border border-white/20 text-white text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
                 >
-                  <option value="" className="text-black">Select Platform</option>
+                  <option value="" className="text-black">
+                    Select Platform
+                  </option>
                   {SOCIAL_PLATFORMS.map((platform) => (
-                    <option key={platform} value={platform} className="text-black">
+                    <option
+                      key={platform}
+                      value={platform}
+                      className="text-black"
+                    >
                       {platform}
                     </option>
                   ))}
                 </select>
 
-
                 {/* URL input */}
                 <Input
                   placeholder="Enter URL"
                   value={social.url}
-                  onChange={(e) => handleSocialChange(idx, "url", e.target.value)}
+                  onChange={(e) =>
+                    handleSocialChange(idx, "url", e.target.value)
+                  }
                 />
 
                 {/* Remove button */}
@@ -269,7 +294,6 @@ export function SiteSettingsPage() {
             </Button>
           </div>
 
-
           <Button
             onClick={saveContact}
             disabled={isContactSaving}
@@ -286,7 +310,9 @@ export function SiteSettingsPage() {
           <CardTitle className="flex items-center gap-2">
             <MapPin className="text-green-500" /> Add New Location
           </CardTitle>
-          <CardDescription>Enter details for your company locations</CardDescription>
+          <CardDescription>
+            Enter details for your company locations
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">

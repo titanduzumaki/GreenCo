@@ -30,7 +30,9 @@ export function MessagesPage() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/api/msg/contacts");
+        const res = await axios.get(
+          "https://greenco-jmk5.onrender.com/api/msg/contacts"
+        );
         const data = Array.isArray(res.data) ? res.data : [];
         setMessages(data);
 
@@ -51,7 +53,9 @@ export function MessagesPage() {
   // Delete message
   const deleteMessage = async (id) => {
     try {
-      await axios.delete(`http://localhost:3001/api/msg/contacts/${id}`);
+      await axios.delete(
+        `https://greenco-jmk5.onrender.com/api/msg/contacts/${id}`
+      );
       setMessages((prev) => prev.filter((msg) => msg._id !== id));
       setUnreadCount((prev) => Math.max(prev - 1, 0));
       toast.success("Message deleted successfully!");
@@ -64,7 +68,9 @@ export function MessagesPage() {
   // Mark as read
   const markAsRead = async (id) => {
     try {
-      await axios.patch(`http://localhost:3001/api/msg/contact/${id}/read`);
+      await axios.patch(
+        `https://greenco-jmk5.onrender.com/api/msg/contact/${id}/read`
+      );
 
       setMessages((prev) =>
         prev.map((msg) => (msg._id === id ? { ...msg, read: true } : msg))

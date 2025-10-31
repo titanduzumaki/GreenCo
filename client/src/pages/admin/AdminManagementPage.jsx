@@ -1,91 +1,127 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { Badge } from '../../components/ui/badge';
-import { Switch } from '../../components/ui/switch';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
-import { toast } from 'sonner';
-import { Plus, Search, UserX } from 'lucide-react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+import { Badge } from "../../components/ui/badge";
+import { Switch } from "../../components/ui/switch";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../../components/ui/dialog";
+import { toast } from "sonner";
+import { Plus, Search, UserX } from "lucide-react";
+import axios from "axios";
 
 export default function AdminManagementPage() {
   const [admins, setAdmins] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [newAdmin, setNewAdmin] = useState({ name: '', email: '', role: 'Admin' });
+  const [newAdmin, setNewAdmin] = useState({
+    name: "",
+    email: "",
+    role: "Admin",
+  });
 
   // Fetch admins from backend
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        const res = await axios.get('http://localhost:3001/api/admins');
+        const res = await axios.get(
+          "https://greenco-jmk5.onrender.com/api/admins"
+        );
         setAdmins(res.data);
       } catch (err) {
         console.error(err);
-        toast.error('Failed to fetch admins');
+        toast.error("Failed to fetch admins");
       }
     };
     fetchAdmins();
   }, []);
 
   // Filters
-  const filteredAdmins = admins.filter(admin => {
+  const filteredAdmins = admins.filter((admin) => {
     const matchesSearch =
       admin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       admin.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || admin.status === filterStatus;
+    const matchesStatus =
+      filterStatus === "all" || admin.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
   // Add Admin
   const handleAddAdmin = async () => {
     if (!newAdmin.name || !newAdmin.email) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
     try {
-      const res = await axios.post('http://localhost:3001/api/admins', {
-        ...newAdmin,
-        status: 'Active',
-      });
-      setAdmins(prev => [...prev, res.data]);
-      toast.success('Admin added successfully');
-      setNewAdmin({ name: '', email: '', role: 'Admin' });
+      const res = await axios.post(
+        "https://greenco-jmk5.onrender.com/api/admins",
+        {
+          ...newAdmin,
+          status: "Active",
+        }
+      );
+      setAdmins((prev) => [...prev, res.data]);
+      toast.success("Admin added successfully");
+      setNewAdmin({ name: "", email: "", role: "Admin" });
       setAddDialogOpen(false);
     } catch (err) {
       console.error(err);
-      toast.error('Failed to add admin');
+      toast.error("Failed to add admin");
     }
   };
 
   // Toggle Active/Inactive
   const handleToggleStatus = async (id) => {
     try {
-      const admin = admins.find(a => a.id === id);
-      const newStatus = admin.status === 'Active' ? 'Disabled' : 'Active';
-      await axios.patch(`http://localhost:3001/api/admins/${id}/status`, { status: newStatus });
-      setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: newStatus } : a));
-      toast.success(`Admin ${newStatus === 'Active' ? 'activated' : 'deactivated'}`);
+      const admin = admins.find((a) => a.id === id);
+      const newStatus = admin.status === "Active" ? "Disabled" : "Active";
+      await axios.patch(
+        `https://greenco-jmk5.onrender.com/api/admins/${id}/status`,
+        { status: newStatus }
+      );
+      setAdmins((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
+      );
+      toast.success(
+        `Admin ${newStatus === "Active" ? "activated" : "deactivated"}`
+      );
     } catch (err) {
       console.error(err);
-      toast.error('Failed to update status');
+      toast.error("Failed to update status");
     }
   };
 
   // Delete Admin
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this admin?')) return;
+    if (!window.confirm("Are you sure you want to delete this admin?")) return;
     try {
-      await axios.delete(`http://localhost:3001/api/admins/${id}`);
-      setAdmins(prev => prev.filter(a => a.id !== id));
-      toast.success('Admin deleted');
+      await axios.delete(`https://greenco-jmk5.onrender.com/api/admins/${id}`);
+      setAdmins((prev) => prev.filter((a) => a.id !== id));
+      toast.success("Admin deleted");
     } catch (err) {
       console.error(err);
-      toast.error('Failed to delete admin');
+      toast.error("Failed to delete admin");
     }
   };
 
@@ -94,11 +130,18 @@ export default function AdminManagementPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-slate-900 dark:text-white mb-2">Admin Management</h1>
-          <p className="text-slate-600 dark:text-slate-400">Manage administrators and their permissions</p>
+          <h1 className="text-slate-900 dark:text-white mb-2">
+            Admin Management
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400">
+            Manage administrators and their permissions
+          </p>
         </div>
         <div className="flex gap-3">
-          <Button onClick={() => setAddDialogOpen(true)} className="bg-green-600 hover:bg-green-700 text-white gap-2">
+          <Button
+            onClick={() => setAddDialogOpen(true)}
+            className="bg-green-600 hover:bg-green-700 text-white gap-2"
+          >
             <Plus className="w-4 h-4" /> Add Admin
           </Button>
         </div>
@@ -143,20 +186,29 @@ export default function AdminManagementPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredAdmins.map(admin => (
+          {filteredAdmins.map((admin) => (
             <TableRow key={admin.id}>
               <TableCell>{admin.name}</TableCell>
               <TableCell>{admin.email}</TableCell>
               <TableCell>{admin.role}</TableCell>
               <TableCell>
-                <Badge variant={admin.status === 'Active' ? 'default' : 'secondary'}>
+                <Badge
+                  variant={admin.status === "Active" ? "default" : "secondary"}
+                >
                   {admin.status}
                 </Badge>
               </TableCell>
-              <TableCell>{admin.lastLogin || 'Never'}</TableCell>
+              <TableCell>{admin.lastLogin || "Never"}</TableCell>
               <TableCell className="flex gap-2">
-                <Switch checked={admin.status === 'Active'} onCheckedChange={() => handleToggleStatus(admin.id)} />
-                <Button variant="outline" size="sm" onClick={() => handleDelete(admin.id)}>
+                <Switch
+                  checked={admin.status === "Active"}
+                  onCheckedChange={() => handleToggleStatus(admin.id)}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDelete(admin.id)}
+                >
                   <UserX className="w-4 h-4" />
                 </Button>
               </TableCell>
@@ -175,14 +227,23 @@ export default function AdminManagementPage() {
             <Input
               placeholder="Name"
               value={newAdmin.name}
-              onChange={(e) => setNewAdmin(prev => ({ ...prev, name: e.target.value }))}
+              onChange={(e) =>
+                setNewAdmin((prev) => ({ ...prev, name: e.target.value }))
+              }
             />
             <Input
               placeholder="Email"
               value={newAdmin.email}
-              onChange={(e) => setNewAdmin(prev => ({ ...prev, email: e.target.value }))}
+              onChange={(e) =>
+                setNewAdmin((prev) => ({ ...prev, email: e.target.value }))
+              }
             />
-            <Select value={newAdmin.role} onValueChange={(value) => setNewAdmin(prev => ({ ...prev, role: value }))}>
+            <Select
+              value={newAdmin.role}
+              onValueChange={(value) =>
+                setNewAdmin((prev) => ({ ...prev, role: value }))
+              }
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Role" />
               </SelectTrigger>

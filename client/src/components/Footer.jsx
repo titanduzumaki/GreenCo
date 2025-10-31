@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Instagram,
+} from "lucide-react";
 import axios from "axios";
 
 const SOCIAL_ICONS = {
@@ -20,7 +28,9 @@ export function Footer() {
   useEffect(() => {
     const fetchSiteSettings = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/api/site-settings");
+        const res = await axios.get(
+          "https://greenco-jmk5.onrender.com/api/site-settings"
+        );
         if (res.data) setSiteSettings(res.data);
       } catch (err) {
         console.error("Failed to fetch site settings:", err);
@@ -62,34 +72,40 @@ export function Footer() {
 
             <div className="space-y-3">
               {/* Emails */}
-              {siteSettings.emails.length
-                ? siteSettings.emails.map((email, idx) => (
-                    <div key={idx} className="flex items-center space-x-3 text-white/70">
-                      <Mail size={16} className="text-green-400" />
-                      <span className="text-sm">{email}</span>
-                    </div>
-                  ))
-                : (
-                  <div className="flex items-center space-x-3 text-white/70">
+              {siteSettings.emails.length ? (
+                siteSettings.emails.map((email, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center space-x-3 text-white/70"
+                  >
                     <Mail size={16} className="text-green-400" />
-                    <span className="text-sm">info@greenco.com</span>
+                    <span className="text-sm">{email}</span>
                   </div>
-                )}
+                ))
+              ) : (
+                <div className="flex items-center space-x-3 text-white/70">
+                  <Mail size={16} className="text-green-400" />
+                  <span className="text-sm">info@greenco.com</span>
+                </div>
+              )}
 
               {/* Phone Numbers */}
-              {siteSettings.phoneNumbers.length
-                ? siteSettings.phoneNumbers.map((phone, idx) => (
-                    <div key={idx} className="flex items-center space-x-3 text-white/70">
-                      <Phone size={16} className="text-green-400" />
-                      <span className="text-sm">{phone}</span>
-                    </div>
-                  ))
-                : (
-                  <div className="flex items-center space-x-3 text-white/70">
+              {siteSettings.phoneNumbers.length ? (
+                siteSettings.phoneNumbers.map((phone, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center space-x-3 text-white/70"
+                  >
                     <Phone size={16} className="text-green-400" />
-                    <span className="text-sm">+1 (555) 123-4567</span>
+                    <span className="text-sm">{phone}</span>
                   </div>
-                )}
+                ))
+              ) : (
+                <div className="flex items-center space-x-3 text-white/70">
+                  <Phone size={16} className="text-green-400" />
+                  <span className="text-sm">+1 (555) 123-4567</span>
+                </div>
+              )}
 
               {/* Static Address */}
               <div className="flex items-center space-x-3 text-white/70">
@@ -154,7 +170,8 @@ export function Footer() {
                 siteSettings.socialLinks.map((social, idx) => {
                   const Icon = SOCIAL_ICONS[social.platform];
                   return (
-                    Icon && social.url && (
+                    Icon &&
+                    social.url && (
                       <a
                         key={idx}
                         href={social.url}
