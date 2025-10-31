@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { usePhotoStore } from "../../store/PhotoStore";
+import { MessageSquare } from "lucide-react";
+
 import {
   Card,
   CardContent,
@@ -103,6 +105,16 @@ export function DashboardPage() {
       color: "text-purple-600 dark:text-purple-400",
       bgColor: "bg-purple-50 dark:bg-purple-950/30",
     },
+{
+  title: "Messages",
+  description: "View and manage contact submissions",
+  icon: MessageSquare,
+  link: "/admin/messages",
+  color: "text-red-600 dark:text-red-400",
+  bgColor: "bg-red-50 dark:bg-red-950/30",
+},
+
+
   ];
 
   return (
@@ -203,9 +215,8 @@ export function DashboardPage() {
                     />
                     <div className="absolute top-2 right-2">
                       <div
-                        className={`w-2 h-2 rounded-full ${
-                          photo.isVisible ? "bg-green-500" : "bg-slate-400"
-                        }`}
+                        className={`w-2 h-2 rounded-full ${photo.isVisible ? "bg-green-500" : "bg-slate-400"
+                          }`}
                       />
                     </div>
                   </div>

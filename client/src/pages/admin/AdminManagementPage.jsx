@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -8,48 +8,84 @@ import { Switch } from '../../components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { toast } from 'sonner';
-import { Plus, Shield, Search, UserPlus, UserX } from 'lucide-react';
+import { Plus, Search, UserX } from 'lucide-react';
+import axios from 'axios';
 
 export default function AdminManagementPage() {
-  const [admins, setAdmins] = useState([
-    { id: '1', name: 'Admin User', email: 'admin@greenco.com', role: 'Admin', status: 'Active', lastLogin: '2025-01-08' },
-    { id: '2', name: 'Jane Doe', email: 'jane@greenco.com', role: 'Editor', status: 'Active', lastLogin: '2025-01-07' },
-    { id: '3', name: 'Bob Smith', email: 'bob@greenco.com', role: 'Editor', status: 'Disabled', lastLogin: '2024-12-20' },
-  ]);
-
+  const [admins, setAdmins] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterRole, setFilterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [newAdmin, setNewAdmin] = useState({ name: '', email: '', role: 'Editor' });
+  const [newAdmin, setNewAdmin] = useState({ name: '', email: '', role: 'Admin' });
 
+  // Fetch admins from backend
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      try {
+        const res = await axios.get('http://localhost:3001/api/admins');
+        setAdmins(res.data);
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to fetch admins');
+      }
+    };
+    fetchAdmins();
+  }, []);
+
+  // Filters
   const filteredAdmins = admins.filter(admin => {
-    const matchesSearch = admin.name.toLowerCase().includes(searchQuery.toLowerCase()) || admin.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = filterRole === 'all' || admin.role === filterRole;
+    const matchesSearch =
+      admin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      admin.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = filterStatus === 'all' || admin.status === filterStatus;
-    return matchesSearch && matchesRole && matchesStatus;
+    return matchesSearch && matchesStatus;
   });
 
-  const handleAddAdmin = () => {
+  // Add Admin
+  const handleAddAdmin = async () => {
     if (!newAdmin.name || !newAdmin.email) {
       toast.error('Please fill in all required fields');
       return;
     }
-    const admin = { id: Date.now().toString(), ...newAdmin, status: 'Active', lastLogin: 'Never' };
-    setAdmins(prev => [...prev, admin]);
-    toast.success('Admin added');
-    setNewAdmin({ name: '', email: '', role: 'Editor' });
-    setAddDialogOpen(false);
+    try {
+      const res = await axios.post('http://localhost:3001/api/admins', {
+        ...newAdmin,
+        status: 'Active',
+      });
+      setAdmins(prev => [...prev, res.data]);
+      toast.success('Admin added successfully');
+      setNewAdmin({ name: '', email: '', role: 'Admin' });
+      setAddDialogOpen(false);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to add admin');
+    }
   };
 
-  const handleToggleStatus = (id) => {
-    setAdmins(prev => prev.map(admin => admin.id === id ? { ...admin, status: admin.status === 'Active' ? 'Disabled' : 'Active' } : admin));
+  // Toggle Active/Inactive
+  const handleToggleStatus = async (id) => {
+    try {
+      const admin = admins.find(a => a.id === id);
+      const newStatus = admin.status === 'Active' ? 'Disabled' : 'Active';
+      await axios.patch(`http://localhost:3001/api/admins/${id}/status`, { status: newStatus });
+      setAdmins(prev => prev.map(a => a.id === id ? { ...a, status: newStatus } : a));
+      toast.success(`Admin ${newStatus === 'Active' ? 'activated' : 'deactivated'}`);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update status');
+    }
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this admin?')) {
+  // Delete Admin
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this admin?')) return;
+    try {
+      await axios.delete(`http://localhost:3001/api/admins/${id}`);
       setAdmins(prev => prev.filter(a => a.id !== id));
       toast.success('Admin deleted');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to delete admin');
     }
   };
 
@@ -80,17 +116,6 @@ export default function AdminManagementPage() {
               className="pl-9 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700"
             />
           </div>
-
-          <Select value={filterRole} onValueChange={setFilterRole}>
-            <SelectTrigger className="w-40 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700">
-              <SelectValue placeholder="Filter by role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
-              <SelectItem value="Admin">Admin</SelectItem>
-              <SelectItem value="Editor">Editor</SelectItem>
-            </SelectContent>
-          </Select>
 
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="w-40 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700">
@@ -128,7 +153,7 @@ export default function AdminManagementPage() {
                   {admin.status}
                 </Badge>
               </TableCell>
-              <TableCell>{admin.lastLogin}</TableCell>
+              <TableCell>{admin.lastLogin || 'Never'}</TableCell>
               <TableCell className="flex gap-2">
                 <Switch checked={admin.status === 'Active'} onCheckedChange={() => handleToggleStatus(admin.id)} />
                 <Button variant="outline" size="sm" onClick={() => handleDelete(admin.id)}>
@@ -163,7 +188,6 @@ export default function AdminManagementPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Admin">Admin</SelectItem>
-                <SelectItem value="Editor">Editor</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -7,6 +7,7 @@ import messageRoute from "./routes/message.route.js";
 import imageRoute from "./routes/images.route.js";
 import cors from "cors";
 import locationRoutes from "./routes/location.route.js";
+import siteSettingsRoutes from "./routes/siteSettingsRoutes.js";
 
 const PORT = ENV.PORT || 4001;
 const app = express();
@@ -19,6 +20,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/msg", messageRoute);
 app.use("/api/images", imageRoute);
 app.use("/api/locations", locationRoutes);
+app.use("/api/site-settings", siteSettingsRoutes);
 
 app.get("/test", (req, res) => {
   res.send("server is working fine");

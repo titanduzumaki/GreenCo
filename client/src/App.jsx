@@ -29,6 +29,10 @@ import { ChangePasswordPage } from "./pages/admin/ChangePasswordPage";
 import AdminManagementPage from "./pages/admin/AdminManagementPage";
 import { UsersGalleryPage } from "./pages/GalleryPage";
 import GalleryPage from "./pages/admin/GalleryPage";
+import { MessagesPage } from "./pages/admin/MessagesPage";
+import { MessageProvider } from "./contexts/MessageContext.jsx";
+
+
 
 import { Toaster } from "sonner";
 import { useAuthStore } from "./store/authStore";
@@ -110,6 +114,7 @@ export default function App() {
             <Route path="settings" element={<SiteSettingsPage />} />
             <Route path="password" element={<ChangePasswordPage />} />
             <Route path="users" element={<AdminManagementPage />} />
+             <Route path="messages" element={<MessagesPage />} />
           </Route>
 
           {/* Redirect legacy URL */}
