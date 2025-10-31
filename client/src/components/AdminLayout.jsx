@@ -46,7 +46,9 @@ export default function AdminLayout() {
   useEffect(() => {
     const fetchUnreadCount = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/api/msg/contacts");
+        const res = await axios.get(
+          "https://greenco-jmk5.onrender.com/api/msg/contacts"
+        );
         const unread = res.data.filter((msg) => !msg.read).length;
         setUnreadCount(unread);
       } catch (err) {
@@ -83,7 +85,9 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 w-64 transform bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-transform duration-300
-        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
+        ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0`}
       >
         <div className="p-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2">

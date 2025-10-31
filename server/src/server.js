@@ -12,7 +12,12 @@ import siteSettingsRoutes from "./routes/siteSettingsRoutes.js";
 const PORT = ENV.PORT || 4001;
 const app = express();
 
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+app.use(
+  cors({
+    origin: [ENV.CLIENT_URL, "http://localhost:5173"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 

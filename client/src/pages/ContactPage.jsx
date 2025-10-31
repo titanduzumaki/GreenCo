@@ -67,8 +67,10 @@ export function ContactPage() {
 
   const [locations, setLocations] = useState([]);
   const { sendContactMessage, loading } = useContactStore();
-  const [siteSettings, setSiteSettings] = useState({ phoneNumbers: [], emails: [] });
-
+  const [siteSettings, setSiteSettings] = useState({
+    phoneNumbers: [],
+    emails: [],
+  });
 
   const headerRef = useRef(null);
   const contactInfoRef = useRef(null);
@@ -77,7 +79,9 @@ export function ContactPage() {
   useEffect(() => {
     const fetchSiteSettings = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/api/site-settings");
+        const res = await axios.get(
+          "https://greenco-jmk5.onrender.com/api/site-settings"
+        );
         if (res.data) setSiteSettings(res.data);
       } catch (err) {
         console.error("Failed to fetch site settings:", err);
@@ -87,12 +91,13 @@ export function ContactPage() {
     fetchSiteSettings();
   }, []);
 
-
   // Fetch locations
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/api/locations");
+        const res = await axios.get(
+          "https://greenco-jmk5.onrender.com/api/locations"
+        );
         setLocations(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("Error fetching locations:", err);
@@ -139,18 +144,22 @@ export function ContactPage() {
     }
   };
 
-
-
   const contactInfo = [
     {
       icon: <Phone className="w-6 h-6 text-green-400" />,
       title: "Phone",
-      details: siteSettings.phoneNumbers.length > 0 ? siteSettings.phoneNumbers : ["+1 (555) 123-4567"],
+      details:
+        siteSettings.phoneNumbers.length > 0
+          ? siteSettings.phoneNumbers
+          : ["+1 (555) 123-4567"],
     },
     {
       icon: <Mail className="w-6 h-6 text-green-400" />,
       title: "Email",
-      details: siteSettings.emails.length > 0 ? siteSettings.emails : ["info@greenco.com"],
+      details:
+        siteSettings.emails.length > 0
+          ? siteSettings.emails
+          : ["info@greenco.com"],
     },
     {
       icon: <MapPin className="w-6 h-6 text-green-400" />,
@@ -158,7 +167,6 @@ export function ContactPage() {
       details: ["123 Energy Boulevard", "Tech City, TC 12345"], // You can also make this dynamic if needed
     },
   ];
-
 
   return (
     <div className="min-h-screen py-20">
