@@ -13,7 +13,7 @@ router.post("/login", login);
 router.post("/logout", logout);
 
 // Protected route to change password
-router.put("/change-password", protect, isAdmin, changePassword);
+router.put("/change-password", protectRoute, isAdmin, changePassword);
 
 // Protected endpoint to get current user data
 // router.get("/me", protect, isAdmin, (req, res) => {
