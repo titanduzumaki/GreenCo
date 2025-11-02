@@ -13,6 +13,7 @@ import { Label } from "../../components/ui/label";
 import { Eye, EyeOff, Lock, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "../../components/ui/alert";
+import { axiosInstance } from "@/lib/axios";
 
 const PasswordInput = ({
   label,
@@ -134,24 +135,12 @@ export function ChangePasswordPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(
-        `https://greenco-jmk5.onrender.com/api/auth/change-password`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include", // Send cookie
-          body: JSON.stringify({
-            currentPassword: formData.currentPassword,
-            newPassword: formData.newPassword,
-          }),
-        }
-      );
+      const res = await axiosInstance.put(`/auth/change-password`, {
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+      });
 
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || "Failed to change password");
-
-      toast.success(data.message);
+      toast.success(res.data.message);
 
       // Clear form
       setFormData({

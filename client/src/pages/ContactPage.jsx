@@ -21,12 +21,12 @@ import {
   cardHover,
   cleanupAnimations,
 } from "../lib/gsapAnimations";
-import axios from "axios";
 
 // Leaflet imports
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { axiosInstance } from "@/lib/axios";
 
 // Fix default leaflet marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -79,9 +79,7 @@ export function ContactPage() {
   useEffect(() => {
     const fetchSiteSettings = async () => {
       try {
-        const res = await axios.get(
-          "https://greenco-jmk5.onrender.com/api/site-settings"
-        );
+        const res = await axiosInstance.get("/site-settings");
         if (res.data) setSiteSettings(res.data);
       } catch (err) {
         console.error("Failed to fetch site settings:", err);
@@ -95,9 +93,7 @@ export function ContactPage() {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const res = await axios.get(
-          "https://greenco-jmk5.onrender.com/api/locations"
-        );
+        const res = await axiosInstance.get("/locations");
         setLocations(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("Error fetching locations:", err);

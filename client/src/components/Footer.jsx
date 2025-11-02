@@ -10,6 +10,7 @@ import {
   Instagram,
 } from "lucide-react";
 import axios from "axios";
+import { axiosInstance } from "@/lib/axios";
 
 const SOCIAL_ICONS = {
   Facebook: Facebook,
@@ -28,9 +29,7 @@ export function Footer() {
   useEffect(() => {
     const fetchSiteSettings = async () => {
       try {
-        const res = await axios.get(
-          "https://greenco-jmk5.onrender.com/api/site-settings"
-        );
+        const res = await axiosInstance.get("/site-settings");
         if (res.data) setSiteSettings(res.data);
       } catch (err) {
         console.error("Failed to fetch site settings:", err);

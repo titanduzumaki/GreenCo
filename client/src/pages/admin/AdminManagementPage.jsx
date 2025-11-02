@@ -29,6 +29,7 @@ import {
 import { toast } from "sonner";
 import { Plus, Search, UserX } from "lucide-react";
 import axios from "axios";
+import { axiosInstance } from "@/lib/axios";
 
 export default function AdminManagementPage() {
   const [admins, setAdmins] = useState([]);
@@ -45,9 +46,7 @@ export default function AdminManagementPage() {
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        const res = await axios.get(
-          "https://greenco-jmk5.onrender.com/api/admins"
-        );
+        const res = await axiosInstance.get("/admins");
         setAdmins(res.data);
       } catch (err) {
         console.error(err);
@@ -74,13 +73,10 @@ export default function AdminManagementPage() {
       return;
     }
     try {
-      const res = await axios.post(
-        "https://greenco-jmk5.onrender.com/api/admins",
-        {
-          ...newAdmin,
-          status: "Active",
-        }
-      );
+      const res = await axiosInstance.post("/admins", {
+        ...newAdmin,
+        status: "Active",
+      });
       setAdmins((prev) => [...prev, res.data]);
       toast.success("Admin added successfully");
       setNewAdmin({ name: "", email: "", role: "Admin" });
@@ -96,10 +92,7 @@ export default function AdminManagementPage() {
     try {
       const admin = admins.find((a) => a.id === id);
       const newStatus = admin.status === "Active" ? "Disabled" : "Active";
-      await axios.patch(
-        `https://greenco-jmk5.onrender.com/api/admins/${id}/status`,
-        { status: newStatus }
-      );
+      await axiosInstance.patch(`/admins/${id}/status`, { status: newStatus });
       setAdmins((prev) =>
         prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
       );
@@ -116,7 +109,7 @@ export default function AdminManagementPage() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this admin?")) return;
     try {
-      await axios.delete(`https://greenco-jmk5.onrender.com/api/admins/${id}`);
+      await axiosInstance.delete(`/admins/${id}`);
       setAdmins((prev) => prev.filter((a) => a.id !== id));
       toast.success("Admin deleted");
     } catch (err) {

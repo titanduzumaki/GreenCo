@@ -13,6 +13,7 @@ import { Label } from "../../components/ui/label";
 import { MapPin, Trash2, Save } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
+import { axiosInstance } from "@/lib/axios";
 
 const SOCIAL_PLATFORMS = ["Facebook", "Twitter", "Instagram", "LinkedIn"];
 
@@ -37,9 +38,7 @@ export function SiteSettingsPage() {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const res = await axios.get(
-          "https://greenco-jmk5.onrender.com/api/locations"
-        );
+        const res = await axiosInstance.get("/locations");
         setLocations(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error(err);
@@ -53,9 +52,7 @@ export function SiteSettingsPage() {
   useEffect(() => {
     const fetchContact = async () => {
       try {
-        const res = await axios.get(
-          "https://greenco-jmk5.onrender.com/api/site-settings"
-        );
+        const res = await axiosInstance.get("/site-settings");
         if (res.data) {
           setContact({
             phoneNumbers: res.data.phoneNumbers.length
@@ -86,15 +83,12 @@ export function SiteSettingsPage() {
       return;
     }
     try {
-      const res = await axios.post(
-        "https://greenco-jmk5.onrender.com/api/locations",
-        {
-          name,
-          latitude: parseFloat(latitude),
-          longitude: parseFloat(longitude),
-          description,
-        }
-      );
+      const res = await axiosInstance.post("/locations", {
+        name,
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        description,
+      });
       setLocations((prev) => [...prev, res.data]);
       setNewLocation({
         name: "",
@@ -112,9 +106,7 @@ export function SiteSettingsPage() {
   const deleteLocation = async (id) => {
     if (!id) return;
     try {
-      await axios.delete(
-        `https://greenco-jmk5.onrender.com/api/locations/${id}`
-      );
+      await axiosInstance.delete(`/locations/${id}`);
       setLocations((prev) => prev.filter((loc) => loc._id !== id));
       toast.success("Location deleted!");
     } catch (err) {
@@ -165,10 +157,7 @@ export function SiteSettingsPage() {
   const saveContact = async () => {
     try {
       setIsContactSaving(true);
-      await axios.post(
-        "https://greenco-jmk5.onrender.com/api/site-settings",
-        contact
-      );
+      await axiosInstance.post("/site-settings", contact);
       toast.success("Contact info saved successfully!");
     } catch (err) {
       console.error(err);

@@ -3,7 +3,6 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "./ThemeProvider";
 import { MessageSquare } from "lucide-react";
 import { Button } from "./ui/button";
-import axios from "axios";
 
 import {
   LayoutDashboard,
@@ -30,6 +29,7 @@ import {
 
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useAuthStore } from "@/store/authStore";
+import { axiosInstance } from "@/lib/axios";
 
 export const UnreadContext = createContext();
 
@@ -46,9 +46,7 @@ export default function AdminLayout() {
   useEffect(() => {
     const fetchUnreadCount = async () => {
       try {
-        const res = await axios.get(
-          "https://greenco-jmk5.onrender.com/api/msg/contacts"
-        );
+        const res = await axiosInstance.get("/msg/contacts");
         const unread = res.data.filter((msg) => !msg.read).length;
         setUnreadCount(unread);
       } catch (err) {

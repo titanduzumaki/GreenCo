@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import { UnreadContext } from "../../components/AdminLayout";
+import { axiosInstance } from "@/lib/axios";
 
 export function MessagesPage() {
   const [messages, setMessages] = useState([]);
@@ -30,9 +31,7 @@ export function MessagesPage() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await axios.get(
-          "https://greenco-jmk5.onrender.com/api/msg/contacts"
-        );
+        const res = await axiosInstance.get("/msg/contacts");
         const data = Array.isArray(res.data) ? res.data : [];
         setMessages(data);
 
@@ -53,9 +52,7 @@ export function MessagesPage() {
   // Delete message
   const deleteMessage = async (id) => {
     try {
-      await axios.delete(
-        `https://greenco-jmk5.onrender.com/api/msg/contacts/${id}`
-      );
+      await axiosInstance.delete(`/msg/contacts/${id}`);
       setMessages((prev) => prev.filter((msg) => msg._id !== id));
       setUnreadCount((prev) => Math.max(prev - 1, 0));
       toast.success("Message deleted successfully!");
@@ -68,9 +65,7 @@ export function MessagesPage() {
   // Mark as read
   const markAsRead = async (id) => {
     try {
-      await axios.patch(
-        `https://greenco-jmk5.onrender.com/api/msg/contact/${id}/read`
-      );
+      await axiosInstance.patch(`/msg/contact/${id}/read`);
 
       setMessages((prev) =>
         prev.map((msg) => (msg._id === id ? { ...msg, read: true } : msg))
