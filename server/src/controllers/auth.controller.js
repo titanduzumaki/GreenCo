@@ -1,3 +1,4 @@
+import { ENV } from "../lib/env.js";
 import { generateToken } from "../lib/utils.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
@@ -75,39 +76,48 @@ export const login = async (req, res) => {
 
 // ----------------- LOGOUT -----------------
 export const logout = (_, res) => {
-  res.cookie("jwt", "", { maxAge: 0 });
+  const { NODE_ENV } = ENV;
+
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    sameSite: "None",
+    secure: ENV.NODE_ENV !== "development",
+    expires: new Date(0),
+  });
   res.status(200).json({ message: "Logged out successfully." });
 };
 
 // ----------------- CHANGE PASSWORD -----------------
-// export const changePassword = async (req, res) => {
-//   try {
-//     const { currentPassword, newPassword } = req.body;
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
 
-//     if (!currentPassword || !newPassword)
-//       return res.status(400).json({ message: "Both fields are required." });
+    if (!currentPassword || !newPassword)
+      return res.status(400).json({ message: "Both fields are required." });
 
-//     const user = await User.findById(req.user._id);
-//     if (!user) return res.status(404).json({ message: "User not found." });
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found." });
 
-//     // Verify current password
-//     const isMatch = await bcrypt.compare(currentPassword, user.password);
-//     if (!isMatch)
-//       return res.status(400).json({ message: "Current password is incorrect." });
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch)
+      return res
+        .status(400)
+        .json({ message: "Current password is incorrect." });
 
-//     // Hash and save new password
-//     const salt = await bcrypt.genSalt(10);
-//     user.password = await bcrypt.hash(newPassword, salt);
-//     await user.save();
+    // Hash and save new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
 
-//     // Logout user after password change
-//     res.cookie("jwt", "", { maxAge: 0 });
+    // Logout user after password change
+    res.cookie("jwt", "", { maxAge: 0 });
 
-//     res
-//       .status(200)
-//       .json({ message: "Password changed successfully. Please login again." });
-//   } catch (err) {
-//     console.error("Change password error:", err);
-//     res.status(500).json({ message: "Internal server error." });
-//   }
-// };
+    res
+      .status(200)
+      .json({ message: "Password changed successfully. Please login again." });
+  } catch (err) {
+    console.error("Change password error:", err);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};

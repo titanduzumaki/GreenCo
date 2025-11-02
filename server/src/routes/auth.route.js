@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { login, logout } from "../controllers/auth.controller.js";
+import {
+  changePassword,
+  login,
+  logout,
+} from "../controllers/auth.controller.js";
 import { isAdmin, protectRoute } from "../middlewares/authMiddleware.js"; // Import protect and isAdmin
 
 const router = Router();
@@ -9,7 +13,7 @@ router.post("/login", login);
 router.post("/logout", logout);
 
 // Protected route to change password
-// router.put("/change-password", protect, isAdmin, changePassword);
+router.put("/change-password", protect, isAdmin, changePassword);
 
 // Protected endpoint to get current user data
 // router.get("/me", protect, isAdmin, (req, res) => {
